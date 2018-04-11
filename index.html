@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="./css/materialize.css" media="screen,projection">
+    <link rel="stylesheet" href="./css/loginPage.css">
+    <title>Login</title>
+</head>
+
+<body>
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#!" class="brand-logo">Login</a>
+            <a href="#" data-target="mobile-demo" class="sidenav-trigger">
+                <i class="material-icons">menu</i>
+            </a>
+            <ul class="right hide-on-med-and-down">
+                <li>
+                    <a class="nav-link" href="./../index.html">Login</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <ul class="sidenav" id="mobile-demo">
+        <li>
+            <a class="nav-link" href="./../index.html">Login</a>
+        </li>
+    </ul>
+
+    <div class="container">
+        <div class="card card-container">
+            <p class="profile-name-card">Hello!!😂</p>
+            <form class="form-signin" onsubmit="validateUser()">
+                <span id="reauth-email" class="reauth-email"></span>
+                <input type="text" id="inputUser" class="form-control" placeholder="User.." required autofocus>
+                <input type="password" id="inputPassword" class="form-control" placeholder="Password.." required>
+
+                <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Sign in</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="./js/materialize.js"></script>
+    <script src="./js/loginPage.js"></script>
+</body>
+
+</html>

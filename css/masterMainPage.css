@@ -1,0 +1,21 @@
+body,
+html {
+    height: 100%;
+}
+
+.secondTitle {
+    margin-left: 10px;
+}
+
+.modal-content {
+    padding-bottom: 0 !important;
+}
+
+#questionTitle {
+    margin-bottom: 0 !important;
+    font-size: 20px;
+}
+
+.card-content span {
+    color: #fff !important;
+}

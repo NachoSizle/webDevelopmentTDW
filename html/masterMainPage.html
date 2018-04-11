@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="./../css/materialize.css" media="screen,projection">
+    <link rel="stylesheet" href="./../css/masterMainPage.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Master Main Page</title>
+</head>
+
+<body>
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#!" class="brand-logo">Master Page</a>
+            <a href="#" data-target="mobile-demo" class="sidenav-trigger">
+                <i class="material-icons">menu</i>
+            </a>
+            <ul class="right hide-on-med-and-down">
+                <li>
+                    <a class="nav-link" href="./masterMainPage.html">Master Page</a>
+                </li>
+                <li>
+                    <a class="nav-link" href="./../index.html" onclick="logout()">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <ul class="sidenav" id="mobile-demo">
+        <li>
+            <a class="nav-link" href="./masterMainPage.html">Master Page</a>
+        </li>
+        <li>
+            <a class="nav-link" href="./../index.html" onclick="logout()">Logout</a>
+        </li>
+    </ul>
+
+    <div>
+        <h3 class="center-align" id="hiMaster"></h3>
+        <h5 class="secondTitle">Aqui tienes los enunciados que de las preguntas que hay en BBDD:</h5>
+        <div class="row" id="containerQuestions"></div>
+    </div>
+
+    <div class="fixed-action-btn">
+        <a id="btnActions" class="btn-floating btn-large red">
+            <i class="large material-icons">mode_edit</i>
+        </a>
+        <ul>
+            <li>
+                <a href="#addModal" class="btn-floating green modal-trigger">
+                    <i class="material-icons">add</i>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="tap-target" data-target="btnActions">
+        <div class="tap-target-content">
+            <h5>Quick Actions</h5>
+            <p>You can make some actions: Add Question...</p>
+        </div>
+    </div>
+
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h4>Set title of question</h4>
+            <div class="input-field col s12">
+                <textarea id="questionTitleTA" class="materialize-textarea"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a onclick="addQuestion()" class="modal-action modal-close waves-effect waves-green btn-flat">Add!</a>
+        </div>
+    </div>
+
+    <div id="remModal" class="modal">
+        <div class="modal-content">
+            <h4>Do you sure to remove this question?</h4>
+            <p id="questionTitle"></p>
+        </div>
+        <div class="modal-footer">
+            <a onclick="removeQuestion()" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="./../js/materialize.js"></script>
+    <script src="./../js/masterMainPage.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="./../css/materialize.css" media="screen,projection">
+    <link rel="stylesheet" href="./../css/viewQuestion.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View Question</title>
+</head>
+
+<body>
+
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#!" class="brand-logo">View Question</a>
+            <a href="#" data-target="mobile-demo" class="sidenav-trigger">
+                <i class="material-icons">menu</i>
+            </a>
+            <ul class="right hide-on-med-and-down">
+                <li>
+                    <a class="nav-link" href="./masterMainPage.html">Master Page</a>
+                </li>
+                <li>
+                    <a class="nav-link" href="./../index.html" onclick="logout()">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <ul class="sidenav" id="mobile-demo">
+        <li>
+            <a class="nav-link" href="./masterMainPage.html">Master Page</a>
+        </li>
+        <li>
+            <a class="nav-link" href="./../index.html" onclick="logout()">Logout</a>
+        </li>
+    </ul>
+
+    <div class="mainContainer">
+        <h5 class="secondTitle">Data</h5>
+        <div class="row" id="containerQuestions">
+            <div class="col s12 m6">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="new badge" data-badge-caption="Solutions" id="badgeNumSolutions"></span>
+                        <span class="card-title" id="titleQuestionCard"></span>
+                    </div>
+                    <div class="card-action">
+                        <div class="switch right">
+                            <label class="lblAvailable">
+                                <input id="checkboxAvailable" type="checkbox">
+                                <span class="lever"></span>
+                                Available
+                            </label>
+                        </div>
+                        <a href="#addSolution" class="modal-trigger">Add solution</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addSolution" class="modal">
+        <div class="modal-content">
+            <h4>Set solution</h4>
+            <h5 id="questionTitleAddSolution" class="questionTitleAddSol"></h5>
+            <div class="input-field col s12">
+                <textarea id="questionSolutionTA " class="materialize-textarea "></textarea>
+            </div>
+        </div>
+        <!--Hay que setear el tamaño del modal como si estuviera lo de racionamiento sin estar hasta que se haga check!-->
+        <div class="rationingContainer scale-transition scale-out">
+            <h4>Set rationing</h4>
+            <h5 id="questionTitleAddSolution" class="questionTitleAddSol"></h5>
+            <div class="input-field col s12">
+                <textarea id="questionSolutionTA " class="materialize-textarea "></textarea>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div class="switch left">
+                <label class="lblAvailable">
+                    <input type="checkbox" id="goodSolutionCheck" class="scale-transition">
+                    <span class="lever"></span>
+                    Good
+                </label>
+            </div>
+            <a onclick="addSolution()" class="modal-action modal-close waves-effect waves-green btn-flat">Add!</a>
+        </div>
+    </div>
+
+    <div class="fixed-action-btn">
+        <a class="btn-floating btn-large waves-effect waves-light green" onclick="saveQuestion()">
+            <i class="material-icons">done</i>
+        </a>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js " integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN "
+        crossorigin="anonymous "></script>
+    <script src="./../js/materialize.js "></script>
+    <script src="./../js/viewQuestion.js "></script>
+</body>
+
+</html>
