@@ -114,7 +114,7 @@ function addQuestion() {
         "title": taValue,
         "id": numElem,
         "available": false,
-        "solutions": {}
+        "solutions": []
     };
 
     this.questions.push(newQuestion);

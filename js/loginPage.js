@@ -45,19 +45,19 @@ function saveDataToLS() {
             "title": "¿Que es el software?",
             "id": 1,
             "available": false,
-            "solutions": {}
+            "solutions": []
         },
         {
             "title": "¿Que es un lenguaje tipado?",
             "id": 2,
             "available": true,
-            "solutions": {}
+            "solutions": []
         },
         {
             "title": "¿Que es la recursividad?",
             "id": 3,
             "available": true,
-            "solutions": {}
+            "solutions": []
         }
     ];
 

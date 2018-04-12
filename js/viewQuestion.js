@@ -28,6 +28,7 @@ function initElements() {
         $('.sidenav').sidenav();
         $('.modal').modal();
         $('.fixed-action-btn').floatingActionButton();
+        $('.collapsible').collapsible();
     });
 }
 
@@ -63,11 +64,58 @@ function setDataToPage() {
         $('#checkboxAvailable').attr('checked', 'checked');
     }
     this.numSolutions = this.questionSelected.solutions.length;
-    $('#badgeNumSolutions').text(this.numSolutions);
+    $('#badgeNumSolutions').text(this.numSolutions ? this.numSolutions : 0);
+
+    setSolutionsToCollapsible();
+}
+
+function setSolutionsToCollapsible() {
+    if (this.numSolutions > 0) {
+        this.questionSelected.solutions.map(function (sol) {
+            var checked = sol.isGood ? 'checked' : '';
+            var structSolution = "<li>" +
+                "<div class='collapsible-header'>" +
+                "<i class='material-icons'>filter_drama</i>First</div>" +
+                "<div class='collapsible-body'>" +
+                "<h5>Answer: " + sol.title + "</h5>" +
+                "<label>" +
+                "<input type='checkbox' checked disabled/>" +
+                "<span>Good</span>" +
+                "</label>" +
+                "<div class='row buttonRationing'>" +
+                "<a href='#' class=''>Add Rationing</a>" +
+                "<a href='#' class=''>Show rationings</a>" +
+                "</div>" +
+                "</div>" +
+                "</li>";
+            $('#collapsibleOfSolutions').append(structSolution)
+        });
+    }
 }
 
 function addSolution() {
+    var solutionTA = $('#questionSolutionTA').val();
+    $('#questionSolutionTA').val('');
 
+    var isGoodSolution = $('#goodSolutionCheck').prop('checked');
+    $('#goodSolutionCheck').removeProp('checked');
+
+    var numOfSolutions = this.numSolutions++;
+
+    if (isGoodSolution) {
+        //Se necesita que el usuario introduzca un racionamiento a la solucion. 
+        //Si se indica que es correcto, se debe meter una justificacion.
+    }
+
+    var solutionObj = {
+        "title": solutionTA,
+        "id": numOfSolutions,
+        "isGood": isGoodSolution
+    };
+
+    this.questionSelected.solutions.push(solutionObj);
+    console.log(this.questionSelected);
+    saveQuestion();
 }
 
 function saveQuestion() {
@@ -90,4 +138,8 @@ function saveQuestion() {
 
 function backToPreviousPage() {
     window.location.href = './masterMainPage.html';
+}
+
+function showSolutions() {
+    $('#solutionsContainer').toggle("slow");
 }

@@ -41,7 +41,7 @@
     <div class="mainContainer">
         <h5 class="secondTitle">Data</h5>
         <div class="row" id="containerQuestions">
-            <div class="col s12 m6">
+            <div class="col s12 m12">
                 <div class="card blue-grey darken-1">
                     <div class="card-content white-text">
                         <span class="new badge" data-badge-caption="Solutions" id="badgeNumSolutions"></span>
@@ -56,8 +56,14 @@
                             </label>
                         </div>
                         <a href="#addSolution" class="modal-trigger">Add solution</a>
+                        <a href="#editSolution" class="modal-trigger">Edit solution</a>
+                        <a href="#" onclick="showSolutions()" class="">Show solutions</a>
                     </div>
                 </div>
+            </div>
+            <div class="col s12 m6" id="solutionsContainer" hidden>
+                <ul class="collapsible" id="collapsibleOfSolutions">
+                </ul>
             </div>
         </div>
     </div>
@@ -67,7 +73,7 @@
             <h4>Set solution</h4>
             <h5 id="questionTitleAddSolution" class="questionTitleAddSol"></h5>
             <div class="input-field col s12">
-                <textarea id="questionSolutionTA " class="materialize-textarea "></textarea>
+                <textarea id="questionSolutionTA" class="materialize-textarea"></textarea>
             </div>
         </div>
         <!--Hay que setear el tamaño del modal como si estuviera lo de racionamiento sin estar hasta que se haga check!-->
@@ -75,7 +81,7 @@
             <h4>Set rationing</h4>
             <h5 id="questionTitleAddSolution" class="questionTitleAddSol"></h5>
             <div class="input-field col s12">
-                <textarea id="questionSolutionTA " class="materialize-textarea "></textarea>
+                <textarea id="questionRationingTA" class="materialize-textarea "></textarea>
             </div>
         </div>
 
