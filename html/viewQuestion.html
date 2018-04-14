@@ -63,6 +63,11 @@
             </div>
             <div class="col s12 m6" id="solutionsContainer" hidden>
                 <ul class="collapsible" id="collapsibleOfSolutions">
+                    <li id="noSolutions" hidden>
+                        <div class='collapsible-header'>
+                            <i class='material-icons'>cancel</i>No solutions yet!
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -96,6 +101,21 @@
             <a onclick="addSolution()" class="modal-action modal-close waves-effect waves-green btn-flat">Add!</a>
         </div>
     </div>
+
+    <div id="addRationing" class="modal">
+        <div class="modal-content">
+            <h4>Set rationing</h4>
+            <h5 id="questionTitleAddRationing" class="questionTitleAddRat"></h5>
+            <div class="input-field col s12">
+                <textarea id="questionRationingTA" class="materialize-textarea"></textarea>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <a onclick="addRationing()" class="modal-action modal-close waves-effect waves-green btn-flat">Add!</a>
+        </div>
+    </div>
+
 
     <div class="fixed-action-btn">
         <a class="btn-floating btn-large waves-effect waves-light green" onclick="saveQuestion()">

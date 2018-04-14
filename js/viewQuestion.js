@@ -5,6 +5,7 @@ window.onload = function () {
 var userLogged = null;
 var questionSelected = null;
 var numSolutions = 0;
+var numRationings = 0;
 
 function init() {
 
@@ -71,6 +72,7 @@ function setDataToPage() {
 
 function setSolutionsToCollapsible() {
     if (this.numSolutions > 0) {
+        $('#noSolutions').attr('hidden');
         this.questionSelected.solutions.map(function (sol) {
             var checked = sol.isGood ? 'checked' : '';
             var structSolution = "<li>" +
@@ -83,13 +85,42 @@ function setSolutionsToCollapsible() {
                 "<span>Good</span>" +
                 "</label>" +
                 "<div class='row buttonRationing'>" +
-                "<a href='#' class=''>Add Rationing</a>" +
-                "<a href='#' class=''>Show rationings</a>" +
+                "<a href='#addRationing' class='modal-trigger' onclick='addRationing()'>Add Rationing</a>" +
+                "<a href='#' onclick='showRationing()'>Show rationings</a>" +
                 "</div>" +
                 "</div>" +
                 "</li>";
             $('#collapsibleOfSolutions').append(structSolution)
         });
+    } else {
+        $('#noSolutions').removeAttr('hidden');
+    }
+}
+
+function setRationingsToCollapsible() {
+    if (this.numRationings > 0) {
+        $('#noSolutions').attr('hidden');
+        this.questionSelected.solutions.map(function (sol) {
+            var checked = sol.isGood ? 'checked' : '';
+            var structSolution = "<li>" +
+                "<div class='collapsible-header'>" +
+                "<i class='material-icons'>filter_drama</i>First</div>" +
+                "<div class='collapsible-body'>" +
+                "<h5>Answer: " + sol.title + "</h5>" +
+                "<label>" +
+                "<input type='checkbox' checked disabled/>" +
+                "<span>Good</span>" +
+                "</label>" +
+                "<div class='row buttonRationing'>" +
+                "<a href='#' onclick='addRationing()'>Add Rationing</a>" +
+                "<a href='#' onclick='showRationing()'>Show rationings</a>" +
+                "</div>" +
+                "</div>" +
+                "</li>";
+            $('#collapsibleOfSolutions').append(structSolution)
+        });
+    } else {
+        $('#noSolutions').removeAttr('hidden');
     }
 }
 
@@ -116,6 +147,14 @@ function addSolution() {
     this.questionSelected.solutions.push(solutionObj);
     console.log(this.questionSelected);
     saveQuestion();
+}
+
+function addRationing() {
+
+}
+
+function showRationing() {
+
 }
 
 function saveQuestion() {
