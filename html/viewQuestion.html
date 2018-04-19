@@ -50,22 +50,34 @@
                     <div class="card-action">
                         <div class="switch right">
                             <label class="lblAvailable">
-                                <input id="checkboxAvailable" type="checkbox">
+                                <input id="checkboxAvailable" onclick="setAvailableQuestion()" type="checkbox">
                                 <span class="lever"></span>
                                 Available
                             </label>
                         </div>
                         <a href="#addSolution" class="modal-trigger">Add solution</a>
-                        <a href="#editSolution" class="modal-trigger">Edit solution</a>
                         <a href="#" onclick="showSolutions()" class="">Show solutions</a>
+                        <a href="#editSolution" class="modal-trigger">Edit question</a>
+                        <a href="#" onclick="saveQuestion()" class="">Save question</a>
                     </div>
                 </div>
             </div>
-            <div class="col s12 m6" id="solutionsContainer" hidden>
+            <div class="col s12 m5" id="solutionsContainer" hidden>
+                <h3>Solutions</h3>
                 <ul class="collapsible" id="collapsibleOfSolutions">
                     <li id="noSolutions" hidden>
                         <div class='collapsible-header'>
                             <i class='material-icons'>cancel</i>No solutions yet!
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="col s12 m7" id="rationingsContainer" hidden>
+                <h3>Rationings</h3>
+                <ul class="collapsible popout" id="collapsibleOfRationings">
+                    <li id="noRationings" hidden>
+                        <div class='collapsible-header'>
+                            <i class='material-icons'>cancel</i>No rationings yet!
                         </div>
                     </li>
                 </ul>
@@ -95,7 +107,7 @@
                 <label class="lblAvailable">
                     <input type="checkbox" id="goodSolutionCheck" class="scale-transition">
                     <span class="lever"></span>
-                    Good
+                    Bad solution
                 </label>
             </div>
             <a onclick="addSolution()" class="modal-action modal-close waves-effect waves-green btn-flat">Add!</a>

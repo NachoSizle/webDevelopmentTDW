@@ -4,6 +4,7 @@ window.onload = function () {
 
 var userLogged = null;
 var questionSelected = null;
+var solutionSelected = null;
 var numSolutions = 0;
 var numRationings = 0;
 
@@ -58,6 +59,11 @@ function loadQuestionToView() {
     this.questionSelected = JSON.parse(question);
 }
 
+function setAvailableQuestion() {
+    var isChecked = $('#checkboxAvailable').prop("checked");
+    this.questionSelected.available = isChecked;
+}
+
 function setDataToPage() {
     $('#titleQuestionCard').text(this.questionSelected.title);
     $('#questionTitleAddSolution').text(this.questionSelected.title);
@@ -74,19 +80,21 @@ function setSolutionsToCollapsible() {
     if (this.numSolutions > 0) {
         $('#noSolutions').attr('hidden');
         this.questionSelected.solutions.map(function (sol) {
-            var checked = sol.isGood ? 'checked' : '';
+            var checked = sol.isGood ? '' : 'checked';
+            var hidden = sol.isGood ? '' : 'hidden';
             var structSolution = "<li>" +
-                "<div class='collapsible-header'>" +
+                "<div class='collapsible-header' onclick='changeSolutionSelected(" + sol.id + ")'>" +
                 "<i class='material-icons'>filter_drama</i>First</div>" +
                 "<div class='collapsible-body'>" +
                 "<h5>Answer: " + sol.title + "</h5>" +
                 "<label>" +
-                "<input type='checkbox' checked disabled/>" +
+                "<input type='checkbox' " + checked + " disabled/>" +
                 "<span>Good</span>" +
                 "</label>" +
                 "<div class='row buttonRationing'>" +
-                "<a href='#addRationing' class='modal-trigger' onclick='addRationing()'>Add Rationing</a>" +
-                "<a href='#' onclick='showRationing()'>Show rationings</a>" +
+                "<a href='#addRationing' class='modal-trigger' " + hidden + " onclick='addRationing()'>Add Rationing</a>" +
+                "<a href='#' " + hidden + " onclick='showRationing(" + sol.id + ")'>Show rationings</a>" +
+                "<a href='#' onclick='editSolution(" + sol.id + ")' " + !hidden + ">Edit solution</a>" +
                 "</div>" +
                 "</div>" +
                 "</li>";
@@ -97,52 +105,54 @@ function setSolutionsToCollapsible() {
     }
 }
 
-function setRationingsToCollapsible() {
-    if (this.numRationings > 0) {
-        $('#noSolutions').attr('hidden');
-        this.questionSelected.solutions.map(function (sol) {
-            var checked = sol.isGood ? 'checked' : '';
-            var structSolution = "<li>" +
-                "<div class='collapsible-header'>" +
-                "<i class='material-icons'>filter_drama</i>First</div>" +
-                "<div class='collapsible-body'>" +
-                "<h5>Answer: " + sol.title + "</h5>" +
-                "<label>" +
-                "<input type='checkbox' checked disabled/>" +
-                "<span>Good</span>" +
-                "</label>" +
-                "<div class='row buttonRationing'>" +
-                "<a href='#' onclick='addRationing()'>Add Rationing</a>" +
-                "<a href='#' onclick='showRationing()'>Show rationings</a>" +
-                "</div>" +
-                "</div>" +
-                "</li>";
-            $('#collapsibleOfSolutions').append(structSolution)
-        });
-    } else {
-        $('#noSolutions').removeAttr('hidden');
+function changeSolutionSelected(idSolution) {
+    console.log("CHANGE!!!");
+    this.solutionSelected = this.questionSelected.solutions[idSolution];
+    this.numRationings = this.solutionSelected.rationings !== undefined ? this.solutionSelected.rationings.length : 0;
+    if ($('#rationingsContainer').is(':visible')) {
+        $('#rationingsContainer').hide();
     }
+}
+
+function editSolution(idSolution) {
+    //Abrir el modal de AddSolution pero con los datos que tenemos rellenados en dicho modal
+    $('#questionSolutionTA').val(this.solutionSelected.title);
+    $('#addSolution').modal('open');
 }
 
 function addSolution() {
     var solutionTA = $('#questionSolutionTA').val();
     $('#questionSolutionTA').val('');
 
-    var isGoodSolution = $('#goodSolutionCheck').prop('checked');
+    var isBadSolution = $('#goodSolutionCheck').prop('checked');
     $('#goodSolutionCheck').removeProp('checked');
 
     var numOfSolutions = this.numSolutions++;
 
-    if (isGoodSolution) {
-        //Se necesita que el usuario introduzca un racionamiento a la solucion. 
-        //Si se indica que es correcto, se debe meter una justificacion.
-    }
-
     var solutionObj = {
         "title": solutionTA,
         "id": numOfSolutions,
-        "isGood": isGoodSolution
+        "isGood": isBadSolution,
+        "rationings": []
     };
+
+    if (isBadSolution) {
+        //Se necesita que el usuario introduzca un racionamiento a la solucion. 
+        //Si se indica que es correcto, se debe meter una justificacion.
+        console.log("Is bad solution");
+        var numOfRationings = this.numRationings++;
+        var solutionRationingTA = $('#questionRationingTA').val();
+        $('#questionRationingTA').val('');
+        var solutionObj = {
+            "title": solutionTA,
+            "id": numOfSolutions,
+            "isGood": isBadSolution,
+            "rationings": [{
+                "title": solutionRationingTA,
+                "id": numOfRationings
+            }]
+        };
+    }
 
     this.questionSelected.solutions.push(solutionObj);
     console.log(this.questionSelected);
@@ -150,16 +160,37 @@ function addSolution() {
 }
 
 function addRationing() {
-
+    console.log("Set rationing");
 }
 
-function showRationing() {
+function showRationing(idSolution) {
+    console.log("Show rationings");
+    $('#rationingsContainer').toggle("slow");
+    if (this.numRationings > 0) {
+        $('.ration').remove();
+        $('#noRationings').attr('hidden');
+        setRationingsToCollapsible();
+    } else {
+        $('#noRationings').removeAttr('hidden');
+    }
+}
 
+function setRationingsToCollapsible() {
+    $('#noRationings').attr('hidden');
+    this.solutionSelected.rationings.map(function (sol) {
+        var structSolution = "<li class='ration'>" +
+            "<div class='collapsible-header'>" +
+            "<i class='material-icons'>filter_drama</i>First</div>" +
+            "<div class='collapsible-body'>" +
+            "<h5>Ration: " + sol.title + "</h5>" +
+            "</div>" +
+            "</li>";
+        $('#collapsibleOfRationings').append(structSolution);
+    });
 }
 
 function saveQuestion() {
-    var isChecked = $('#checkboxAvailable').prop("checked");
-    this.questionSelected.available = isChecked;
+    setAvailableQuestion();
     localStorage.setItem('questionSelected', JSON.stringify(this.questionSelected));
 
     var questions = localStorage.getItem('questionsMaster');
@@ -171,7 +202,6 @@ function saveQuestion() {
 
     newQuestions.push(this.questionSelected);
     localStorage.setItem('questionsMaster', JSON.stringify(newQuestions));
-
     backToPreviousPage();
 }
 

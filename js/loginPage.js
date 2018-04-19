@@ -43,19 +43,19 @@ function saveDataToLS() {
 
     var questionsMasterMock = [{
             "title": "¿Que es el software?",
-            "id": 1,
+            "id": 0,
             "available": false,
             "solutions": []
         },
         {
             "title": "¿Que es un lenguaje tipado?",
-            "id": 2,
+            "id": 1,
             "available": true,
             "solutions": []
         },
         {
             "title": "¿Que es la recursividad?",
-            "id": 3,
+            "id": 2,
             "available": true,
             "solutions": []
         }
