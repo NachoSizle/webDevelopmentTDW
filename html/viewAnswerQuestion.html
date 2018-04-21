@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="./../css/materialize.css" media="screen,projection">
+    <link rel="stylesheet" href="./../css/viewQuestion.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Answer Question</title>
+</head>
+
+<body>
+
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#!" class="brand-logo">Answer Question</a>
+            <a href="#" data-target="mobile-demo" class="sidenav-trigger">
+                <i class="material-icons">menu</i>
+            </a>
+            <ul class="right hide-on-med-and-down">
+                <li>
+                    <a class="nav-link" href="./studentMainPage.html">Student Page</a>
+                </li>
+                <li>
+                    <a class="nav-link" href="./../index.html" onclick="logout()">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <ul class="sidenav" id="mobile-demo">
+        <li>
+            <a class="nav-link" href="./studentMainPage.html">Student Page</a>
+        </li>
+        <li>
+            <a class="nav-link" href="./../index.html" onclick="logout()">Logout</a>
+        </li>
+    </ul>
+
+    <div class="mainContainer">
+        <h5 class="secondTitle">Answer this question:</h5>
+        <div class="row" id="containerQuestions">
+            <div class="col s12 m12">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title" id="titleQuestionCard"></span>
+                    </div>
+                    <div class="card-action">
+                        <a href="#addSolution" class="modal-trigger">Propose solution</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col s12 m5" id="solutionsContainer" hidden>
+                <h3>Solutions</h3>
+                <ul class="collapsible" id="collapsibleOfSolutions">
+                    <li id="noSolutions" hidden>
+                        <div class='collapsible-header'>
+                            <i class='material-icons'>cancel</i>No solutions yet!
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="col s12 m7" id="rationingsContainer" hidden>
+                <h3>Rationings</h3>
+                <ul class="collapsible popout" id="collapsibleOfRationings">
+                    <li id="noRationings" hidden>
+                        <div class='collapsible-header'>
+                            <i class='material-icons'>cancel</i>No rationings yet!
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed-action-btn">
+        <a class="btn-floating btn-large waves-effect waves-light green" onclick="saveQuestion()">
+            <i class="material-icons">done</i>
+        </a>
+    </div>
+
+    <div id="addSolution" class="modal">
+        <div class="modal-content">
+            <h4>Set solution</h4>
+            <h5 id="questionTitleAddSolution" class="questionTitleAddSol"></h5>
+            <div class="input-field col s12">
+                <textarea id="questionSolutionTA" class="materialize-textarea"></textarea>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div class="switch left">
+                <label class="lblAvailable">
+                    <input type="checkbox" id="goodSolutionCheck" class="scale-transition">
+                    <span class="lever"></span>
+                    Bad solution
+                </label>
+            </div>
+            <a onclick="addSolution()" class="modal-action modal-close waves-effect waves-green btn-flat">Add!</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js " integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN "
+        crossorigin="anonymous "></script>
+    <script src="./../js/materialize.js "></script>
+    <script src="./../js/viewAnswerQuestion.js "></script>
+</body>
+
+</html>
