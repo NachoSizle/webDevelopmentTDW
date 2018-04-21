@@ -7,6 +7,8 @@ var questionSelected = null;
 var solutionSelected = null;
 var numSolutions = 0;
 var numRationings = 0;
+var numSolutionToEdit = 0;
+var editSolutionMode = false;
 
 function init() {
 
@@ -59,11 +61,6 @@ function loadQuestionToView() {
     this.questionSelected = JSON.parse(question);
 }
 
-function setAvailableQuestion() {
-    var isChecked = $('#checkboxAvailable').prop("checked");
-    this.questionSelected.available = isChecked;
-}
-
 function setDataToPage() {
     $('#titleQuestionCard').text(this.questionSelected.title);
     $('#questionTitleAddSolution').text(this.questionSelected.title);
@@ -92,7 +89,7 @@ function setSolutionsToCollapsible() {
                 "<span>Good</span>" +
                 "</label>" +
                 "<div class='row buttonRationing'>" +
-                "<a href='#addRationing' class='modal-trigger' " + hidden + " onclick='addRationing()'>Add Rationing</a>" +
+                "<a href='#addRationing' class='modal-trigger' " + hidden + ">Add Rationing</a>" +
                 "<a href='#' " + hidden + " onclick='showRationing(" + sol.id + ")'>Show rationings</a>" +
                 "<a href='#' onclick='editSolution(" + sol.id + ")' " + !hidden + ">Edit solution</a>" +
                 "</div>" +
@@ -107,16 +104,20 @@ function setSolutionsToCollapsible() {
 
 function changeSolutionSelected(idSolution) {
     console.log("CHANGE!!!");
-    this.solutionSelected = this.questionSelected.solutions[idSolution];
-    this.numRationings = this.solutionSelected.rationings !== undefined ? this.solutionSelected.rationings.length : 0;
+    this.solutionSelected = this.questionSelected.solutions.filter(function (solution) {
+        return solution.id === idSolution;
+    });
+    this.numRationings = this.solutionSelected[0].rationings !== undefined ? this.solutionSelected[0].rationings.length : 0;
     if ($('#rationingsContainer').is(':visible')) {
         $('#rationingsContainer').hide();
     }
 }
 
 function editSolution(idSolution) {
-    //Abrir el modal de AddSolution pero con los datos que tenemos rellenados en dicho modal
-    $('#questionSolutionTA').val(this.solutionSelected.title);
+    this.editSolutionMode = true;
+    this.numSolutionToEdit = idSolution;
+    $('#questionSolutionTA').val(this.solutionSelected[0].title);
+    this.questionSelected.solutions.splice(this.numSolutionToEdit, 1);
     $('#addSolution').modal('open');
 }
 
@@ -127,11 +128,11 @@ function addSolution() {
     var isBadSolution = $('#goodSolutionCheck').prop('checked');
     $('#goodSolutionCheck').removeProp('checked');
 
-    var numOfSolutions = this.numSolutions++;
+    this.numSolution = this.editSolutionMode ? this.numSolutionToEdit : this.numSolutions;
 
     var solutionObj = {
         "title": solutionTA,
-        "id": numOfSolutions,
+        "id": this.numSolution,
         "isGood": isBadSolution,
         "rationings": []
     };
@@ -140,27 +141,42 @@ function addSolution() {
         //Se necesita que el usuario introduzca un racionamiento a la solucion. 
         //Si se indica que es correcto, se debe meter una justificacion.
         console.log("Is bad solution");
-        var numOfRationings = this.numRationings++;
         var solutionRationingTA = $('#questionRationingTA').val();
         $('#questionRationingTA').val('');
         var solutionObj = {
             "title": solutionTA,
-            "id": numOfSolutions,
+            "id": this.numSolution,
             "isGood": isBadSolution,
             "rationings": [{
                 "title": solutionRationingTA,
-                "id": numOfRationings
+                "id": this.numRationings
             }]
         };
+        this.numRationings++;
     }
 
     this.questionSelected.solutions.push(solutionObj);
+    this.editSolutionMode = false;
+
     console.log(this.questionSelected);
     saveQuestion();
 }
 
 function addRationing() {
     console.log("Set rationing");
+    //Añadimos el razonamiento a los razonamientos que tenemos en solucionSelected[0]
+    console.log(this.solutionSelected[0]);
+
+    var solutionAddRationingTA = $('#questionAddRationingTA').val();
+    $('#questionAddRationingTA').val('');
+
+    var rationingObj = {
+        "title": solutionAddRationingTA,
+        "id": this.numRationings
+    };
+
+    this.solutionSelected[0].rationings.push(rationingObj);
+    saveQuestion();
 }
 
 function showRationing(idSolution) {
@@ -169,15 +185,15 @@ function showRationing(idSolution) {
     if (this.numRationings > 0) {
         $('.ration').remove();
         $('#noRationings').attr('hidden');
-        setRationingsToCollapsible();
+        setRationingsToCollapsible(idSolution);
     } else {
         $('#noRationings').removeAttr('hidden');
     }
 }
 
-function setRationingsToCollapsible() {
+function setRationingsToCollapsible(idSolution) {
     $('#noRationings').attr('hidden');
-    this.solutionSelected.rationings.map(function (sol) {
+    this.solutionSelected[0].rationings.map(function (sol) {
         var structSolution = "<li class='ration'>" +
             "<div class='collapsible-header'>" +
             "<i class='material-icons'>filter_drama</i>First</div>" +
@@ -202,7 +218,15 @@ function saveQuestion() {
 
     newQuestions.push(this.questionSelected);
     localStorage.setItem('questionsMaster', JSON.stringify(newQuestions));
+    if (!this.editSolutionMode) {
+        this.numSolutions++;
+    }
     backToPreviousPage();
+}
+
+function setAvailableQuestion() {
+    var isChecked = $('#checkboxAvailable').prop("checked");
+    this.questionSelected.available = isChecked;
 }
 
 function backToPreviousPage() {
@@ -211,4 +235,7 @@ function backToPreviousPage() {
 
 function showSolutions() {
     $('#solutionsContainer').toggle("slow");
+    if ($('#rationingsContainer').is(':visible')) {
+        $('#rationingsContainer').hide();
+    }
 }

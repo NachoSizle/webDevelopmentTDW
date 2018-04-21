@@ -135,4 +135,5 @@ function removeQuestion() {
 
 function logout() {
     localStorage.removeItem('userLogged');
+    localStorage.removeItem('questionSelected');
 }
