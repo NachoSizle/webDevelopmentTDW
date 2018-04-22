@@ -2,6 +2,11 @@ window.onload = function () {
     init();
 };
 
+var userLogged = null;
+var proposeSolutions = [];
+var questionSelected = null;
+var numSolutions = 0;
+
 function init() {
     initElements();
     loadInitValues();
@@ -19,13 +24,17 @@ function initElements() {
 
 function loadInitValues() {
     loadProfile();
-    loadQuestionToView();
+    checkIfHasProposeSolution();
 }
 
 function loadProfile() {
     if (supportsHTML5Storage()) {
         var user = localStorage.getItem('userLogged');
         this.userLogged = JSON.parse(user);
+        var proposeSol = localStorage.getItem('proposeSolutions');
+        this.proposeSolutions = JSON.parse(proposeSol);
+        var question = localStorage.getItem('questionSelected');
+        this.questionSelected = JSON.parse(question);
     }
 }
 
@@ -37,38 +46,43 @@ function supportsHTML5Storage() {
     }
 }
 
-function loadQuestionToView() {
-    var question = localStorage.getItem('questionSelected');
-    this.questionSelected = JSON.parse(question);
-}
-
 function setDataToPage() {
     $('#titleQuestionCard').text(this.questionSelected.title);
     $('#questionTitleAddSolution').text(this.questionSelected.title);
-    if (this.questionSelected.available) {
-        $('#checkboxAvailable').attr('checked', 'checked');
-    }
+
     this.numSolutions = this.questionSelected.solutions.length;
-    $('#badgeNumSolutions').text(this.numSolutions ? this.numSolutions : 0);
 }
 
-function saveQuestion() {
-    setAvailableQuestion();
-    localStorage.setItem('questionSelected', JSON.stringify(this.questionSelected));
+function addSolution() {
+    var proposeSolutionTA = $('#questionProposeSolutionTA').val();
+    $('#questionProposeSolutionTA').val('');
 
-    var questions = localStorage.getItem('questionsMaster');
-    var questionsParsered = JSON.parse(questions);
+    var proposeSolutionObj = {
+        "proposeSolution": proposeSolutionTA,
+        "question": this.questionSelected.title,
+        "student": this.userLogged.name,
+        "idQuestion": this.questionSelected.id
+    };
 
-    var newQuestions = questionsParsered.filter(function (question) {
-        return question.id !== this.questionSelected.id;
+    this.proposeSolutions.push(proposeSolutionObj);
+
+    saveProposeSolution();
+    checkIfHasProposeSolution();
+}
+
+function saveProposeSolution() {
+    localStorage.setItem('proposeSolutions', JSON.stringify(this.proposeSolutions));
+}
+
+function checkIfHasProposeSolution() {
+    this.proposeSolutions.map(function (proposeSol) {
+        this.hasProposeSolution = this.questionSelected.id === proposeSol.idQuestion;
+
+        if (this.hasProposeSolution) {
+            $('#porposeSolutionText').text(proposeSol.proposeSolution);
+            $('#btnAddProposeSolution').addClass('disabled');
+        }
     });
-
-    newQuestions.push(this.questionSelected);
-    localStorage.setItem('questionsMaster', JSON.stringify(newQuestions));
-    if (!this.editSolutionMode) {
-        this.numSolutions++;
-    }
-    backToPreviousPage();
 }
 
 function backToPreviousPage() {

@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="./../css/materialize.css" media="screen,projection">
-    <link rel="stylesheet" href="./../css/viewQuestion.css">
+    <link rel="stylesheet" href="./../css/viewAnswerQuestion.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Answer Question</title>
 </head>
@@ -47,29 +47,19 @@
                         <span class="card-title" id="titleQuestionCard"></span>
                     </div>
                     <div class="card-action">
-                        <a href="#addSolution" class="modal-trigger">Propose solution</a>
+                        <a href="#addSolution" class="waves-effect waves-teal btn-flat modal-trigger" id="btnAddProposeSolution">Propose solution</a>
                     </div>
                 </div>
             </div>
-            <div class="col s12 m5" id="solutionsContainer" hidden>
-                <h3>Solutions</h3>
-                <ul class="collapsible" id="collapsibleOfSolutions">
-                    <li id="noSolutions" hidden>
-                        <div class='collapsible-header'>
-                            <i class='material-icons'>cancel</i>No solutions yet!
+            <div class="col s12 m5" id="proposedSolutionsContainer">
+                <h5>Proposed solution</h5>
+                <div class="card horizontal">
+                    <div class="card-stacked">
+                        <div class="card-content pad10">
+                            <p id="porposeSolutionText"></p>
                         </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="col s12 m7" id="rationingsContainer" hidden>
-                <h3>Rationings</h3>
-                <ul class="collapsible popout" id="collapsibleOfRationings">
-                    <li id="noRationings" hidden>
-                        <div class='collapsible-header'>
-                            <i class='material-icons'>cancel</i>No rationings yet!
-                        </div>
-                    </li>
-                </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -85,18 +75,11 @@
             <h4>Set solution</h4>
             <h5 id="questionTitleAddSolution" class="questionTitleAddSol"></h5>
             <div class="input-field col s12">
-                <textarea id="questionSolutionTA" class="materialize-textarea"></textarea>
+                <textarea id="questionProposeSolutionTA" class="materialize-textarea"></textarea>
             </div>
         </div>
 
         <div class="modal-footer">
-            <div class="switch left">
-                <label class="lblAvailable">
-                    <input type="checkbox" id="goodSolutionCheck" class="scale-transition">
-                    <span class="lever"></span>
-                    Bad solution
-                </label>
-            </div>
             <a onclick="addSolution()" class="modal-action modal-close waves-effect waves-green btn-flat">Add!</a>
         </div>
     </div>
