@@ -20,51 +20,55 @@ function initElements() {
 function saveDataToLS() {
 
     var usersMock = [{
-        "name": "Nacho",
-        "user": "nacho",
-        "password": "qwerty",
-        "role": "student"
-    },
-    {
-        "name": "Borja",
-        "user": "borja",
-        "password": "qwerty",
-        "role": "student"
-    },
-    {
-        "name": "Luis",
-        "user": "luis",
-        "password": "qwerty",
-        "role": "master"
-    }
+            "name": "Nacho",
+            "user": "nacho",
+            "password": "qwerty",
+            "role": "student"
+        },
+        {
+            "name": "Borja",
+            "user": "borja",
+            "password": "qwerty",
+            "role": "student"
+        },
+        {
+            "name": "Luis",
+            "user": "luis",
+            "password": "qwerty",
+            "role": "master"
+        }
     ];
 
     localStorage.setItem('usersMock', JSON.stringify(usersMock));
 
     var questionsMasterMock = [{
-        "title": "¿Que es el software?",
-        "id": 0,
-        "available": false,
-        "solutions": []
-    },
-    {
-        "title": "¿Que es un lenguaje tipado?",
-        "id": 1,
-        "available": true,
-        "solutions": []
-    },
-    {
-        "title": "¿Que es la recursividad?",
-        "id": 2,
-        "available": true,
-        "solutions": []
-    }
+            "title": "¿Que es el software?",
+            "id": 0,
+            "available": false,
+            "solutions": []
+        },
+        {
+            "title": "¿Que es un lenguaje tipado?",
+            "id": 1,
+            "available": true,
+            "solutions": []
+        },
+        {
+            "title": "¿Que es la recursividad?",
+            "id": 2,
+            "available": true,
+            "solutions": []
+        }
     ];
 
-    localStorage.setItem('questionsMaster', JSON.stringify(questionsMasterMock));
+    if (localStorage.getItem('questionsMaster').length === 0) {
+        localStorage.setItem('questionsMaster', JSON.stringify(questionsMasterMock));
+    }
 
     var proposeSolutions = [];
-    localStorage.setItem('proposeSolutions', JSON.stringify(proposeSolutions));
+    if (localStorage.getItem('proposeSolutions').length === 0) {
+        localStorage.setItem('proposeSolutions', JSON.stringify(proposeSolutions));
+    }
 }
 
 function loadProfile() {

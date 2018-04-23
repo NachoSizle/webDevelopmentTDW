@@ -33,6 +33,10 @@ function loadProfile() {
         this.userLogged = JSON.parse(user);
         var proposeSol = localStorage.getItem('proposeSolutions');
         this.proposeSolutions = JSON.parse(proposeSol);
+        if (this.proposeSolutions.length === 0) {
+            $('#proposedSolutionsContainer').removeClass('scale-in').addClass('scale-out');
+            $('#proposedSolutionsContainer').height(0);
+        }
         var question = localStorage.getItem('questionSelected');
         this.questionSelected = JSON.parse(question);
     }
@@ -81,8 +85,19 @@ function checkIfHasProposeSolution() {
         if (this.hasProposeSolution) {
             $('#porposeSolutionText').text(proposeSol.proposeSolution);
             $('#btnAddProposeSolution').addClass('disabled');
+            $('#proposedSolutionsContainer').removeClass('scale-out').addClass('scale-in');
+            $('#proposedSolutionsContainer').height('auto');
+
+            checkIfQuestionHasFollowingSolutions();
         }
     });
+}
+
+function checkIfQuestionHasFollowingSolutions() {
+    $('#followingSolutionContainer').removeClass('scale-out').addClass('scale-in');
+    $('#followingSolutionContainer').height('auto');
+
+
 }
 
 function backToPreviousPage() {
