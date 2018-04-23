@@ -14,3 +14,27 @@ html {
 .card .card-action {
     padding: 5px 10px !important;
 }
+
+.correctAnswer {
+    color: #388e3c;
+}
+
+.incorrectAnswer {
+    color: #d32f2f;
+}
+
+.proposedRationing {
+    margin-left: 5% !important;
+}
+
+.checkRationing {
+    margin-left: 10% !important;
+}
+
+.noMarginTop {
+    margin-top: 0px !important;
+}
+
+.noMarginBottom {
+    margin-bottom: 0px !important;
+}
