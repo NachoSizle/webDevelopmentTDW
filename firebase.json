@@ -1,0 +1,13 @@
+{
+  "hosting": {
+    "public": "public/webApp",
+    "ignore": [
+      "firebase.json",
+      "**/.*"
+    ],
+    "rewrites": [{
+      "source": "**",
+      "destination": "/index.html"
+    }]
+  }
+}
