@@ -143,13 +143,17 @@ function addSolution() {
         console.log("Is bad solution");
         var solutionRationingTA = $('#questionRationingTA').val();
         $('#questionRationingTA').val('');
+
+        var isJustify = $('#justifyRationingCheckAddSolution').prop('checked');
+        $('#justifyRationingCheckAddSolution').removeProp('checked');
         var solutionObj = {
             "title": solutionTA,
             "id": this.numSolution,
             "isGood": isBadSolution,
             "rationings": [{
                 "title": solutionRationingTA,
-                "id": this.numRationings
+                "id": this.numRationings,
+                "justifyRationing": isJustify
             }]
         };
         this.numRationings++;
@@ -170,9 +174,13 @@ function addRationing() {
     var solutionAddRationingTA = $('#questionAddRationingTA').val();
     $('#questionAddRationingTA').val('');
 
+    var isJustify = $('#justifyRationingCheck').prop('checked');
+    $('#justifyRationingCheck').removeProp('checked');
+
     var rationingObj = {
         "title": solutionAddRationingTA,
-        "id": this.numRationings
+        "id": this.numRationings,
+        "justifyRationing": isJustify
     };
 
     this.solutionSelected[0].rationings.push(rationingObj);
@@ -194,11 +202,19 @@ function showRationing(idSolution) {
 function setRationingsToCollapsible(idSolution) {
     $('#noRationings').attr('hidden');
     this.solutionSelected[0].rationings.map(function (sol) {
+        var isChecked = sol.justifyRationing ? 'checked' : '';
+        var isJustify = sol.justifyRationing ? 'Justify' : 'Not justify';
+        var isJustifyColor = sol.justifyRationing ? 'justifySwitch' : 'notJustifySwitch';
         var structSolution = "<li class='ration'>" +
             "<div class='collapsible-header'>" +
             "<i class='material-icons'>filter_drama</i>First</div>" +
             "<div class='collapsible-body'>" +
             "<h5>Ration: " + sol.title + "</h5>" +
+            "<div class='switch'>" +
+            "<label class='lblAvailable " + isJustifyColor + "'>" +
+            "<input type='checkbox' " + isChecked + " disabled>" +
+            "<span class='lever'></span>" + isJustify + "</label>" +
+            "</div>" +
             "</div>" +
             "</li>";
         $('#collapsibleOfRationings').append(structSolution);

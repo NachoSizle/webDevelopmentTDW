@@ -41,6 +41,16 @@ html {
     padding-top: 10px !important;
 }
 
+.rationingContainer .switch .lblAvailable,
+#addRationing .switch .lblAvailable {
+    font-size: 16px;
+    color: #43a047 !important;
+}
+
+.rationingContainer .switch .lblAvailable .lever {
+    margin-left: 0px !important;
+}
+
 .modal-footer .switch .lblAvailable {
     font-size: 16px;
     color: #e53935 !important;
@@ -53,4 +63,12 @@ html {
 
 .buttonRationing a {
     margin-left: 10px !important;
+}
+
+.justifySwitch {
+    color: #43a047 !important;
+}
+
+.notJustifySwitch {
+    color: #e53935 !important;
 }

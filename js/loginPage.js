@@ -60,13 +60,14 @@ function saveDataToLS() {
             "solutions": []
         }
     ];
-
-    if (localStorage.getItem('questionsMaster').length === 0) {
+    var questionsMasterLS = localStorage.getItem('questionsMaster');
+    if (questionsMasterLS === null || questionsMasterLS.length === 0) {
         localStorage.setItem('questionsMaster', JSON.stringify(questionsMasterMock));
     }
 
     var proposeSolutions = [];
-    if (localStorage.getItem('proposeSolutions').length === 0) {
+    var proposeSolutionsLS = localStorage.getItem('proposeSolutions');
+    if (proposeSolutionsLS === null || proposeSolutionsLS.length === 0) {
         localStorage.setItem('proposeSolutions', JSON.stringify(proposeSolutions));
     }
 }

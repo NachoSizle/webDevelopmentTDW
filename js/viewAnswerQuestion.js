@@ -7,6 +7,7 @@ var proposeSolutions = [];
 var questionSelected = null;
 var numSolutions = 0;
 var actualSolution = null;
+var proposedRationing = null;
 
 function init() {
     initElements();
@@ -156,7 +157,7 @@ function showContainerAnswerRationing(idSolution) {
         "<h5 id='textProposeRationing" + idSolution + "'></h5>" +
         "</div>" +
         "</div>" +
-        "<div class='card-action' id='actionFollowingSolution" + idSolution + "'>" +
+        "<div class='card-action' id='actionSaveProposeRationing" + idSolution + "'>" +
         "<a href='#' onclick='saveProposeRationing(" + idSolution + ")' class='right'>Save!</a>" +
         "</div>" +
         "</div>" +
@@ -173,7 +174,14 @@ function saveProposeRationing(idSolution) {
     $('#textHeaderProposeRationing' + idSolution).text('Your proposed rationing: ');
     $('#textProposeRationing' + idSolution).text(proposedRationing);
 
-    console.log(proposedRationing);
+    this.proposedRationing = {
+        "proposedRationing": proposedRationing,
+        "idSolution": idSolution,
+        "user": this.userLogged.user,
+
+    };
+
+    $('#actionSaveProposeRationing' + idSolution).prop('hidden', true);
 
     showAllIncorrectSolutions(idSolution);
 }
@@ -185,16 +193,16 @@ function showAllIncorrectSolutions(idSolution) {
                 "<div class='card-stacked'>" +
                 "<div class='card-content pad10'>" +
                 "<span class='right'>" +
-                "<i class='material-icons' id='resValidateAnswer" + rationing.id + "'></i>" +
+                "<i class='material-icons' id='resValidateAnswerRationing" + rationing.id + "'></i>" +
                 "</span>" +
                 "<p>" + rationing.title + "</p>" +
                 "</div>" +
-                "<div class='card-action' id='actionFollowingSolution" + rationing.id + "'>" +
+                "<div class='card-action' id='actionRationingSolution" + rationing.id + "'>" +
                 "<label>" +
-                "<input id='itsNotCorrectAnswer" + rationing.id + "' type='checkbox'/>" +
-                "<span>It's not correct</span>" +
+                "<input id='itsNotCorrectAnswerProposedRationings" + rationing.id + "' type='checkbox'/>" +
+                "<span>It's not justify</span>" +
                 "</label>" +
-                "<a href='#' onclick='validateRationing(" + rationing.id + ")' class='right'>Validate!</a>" +
+                "<a href='#' onclick='validateRationing(" + rationing.id + ", " + idSolution + ")' class='right'>Validate!</a>" +
                 "</div>" +
                 "</div>" +
                 "</div>";
@@ -204,8 +212,26 @@ function showAllIncorrectSolutions(idSolution) {
     }
 }
 
-function validateRationing(rationing) {
-    console.log(rationing);
+function validateRationing(idRationing, idSolution) {
+    var justifyRationing = $('#itsNotCorrectAnswerProposedRationings' + idRationing).prop('checked');
+    var actualRationing = this.incorrectSolutions[idSolution].rationings[idRationing];
+
+    if (justifyRationing === actualRationing.justifyRationing) {
+        //El estudiante ha acertado y empieza el flujo de los razonamientos
+        console.log("Acierto!!!!!");
+        $('#resValidateAnswerRationing' + idRationing).text('check_circle');
+        if ($('#resValidateAnswerRationing' + idRationing).hasClass('incorrectAnswer')) {
+            $('#resValidateAnswerRationing' + idRationing).removeClass('incorrectAnswer');
+        }
+        $('#resValidateAnswerRationing' + idRationing).addClass('correctAnswer');
+    } else {
+        console.log("Fallo!!!!!");
+        $('#resValidateAnswerRationing' + idRationing).text('cancel');
+        if ($('#resValidateAnswerRationing' + idRationing).hasClass('correctAnswer')) {
+            $('#resValidateAnswerRationing' + idRationing).removeClass('correctAnswer');
+        }
+        $('#resValidateAnswerRationing' + idRationing).addClass('incorrectAnswer');
+    }
 }
 
 function finishThisFollowingSolution(idSolution) {
