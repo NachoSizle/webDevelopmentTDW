@@ -74,6 +74,7 @@ function getQuestions() {
             "<div class='card-action'>" +
             "<a href='#' onclick='viewThisQuestion(" + question["id"] + ")'><i class='material-icons'>visibility</i> View</a>" +
             "<a href='#remModal' onclick='setQuestion(" + question["id"] + ")' class='modal-trigger'><i class='material-icons'>delete_forever</i> Remove</a>" +
+            "<a href='#' onclick='viewAnswerFromStudents(" + question["id"] + ")'><i class='material-icons'>visibility</i> View Answers</a>" +
             "</div>" +
             "</div>" +
             "</div>";
@@ -83,6 +84,11 @@ function getQuestions() {
 
 function getIsChecked(question) {
     console.log(question);
+}
+
+function viewAnswerFromStudents(questionId) {
+    setSelectedQuestion(questionId);
+    window.location.href = "./viewAnswerStudent.html";
 }
 
 function viewThisQuestion(questionId) {

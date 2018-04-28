@@ -2,6 +2,8 @@ window.onload = function () {
     init();
 };
 
+var answersSolutionStudent = [];
+
 function init() {
     initElements();
     loadProfile();
@@ -48,9 +50,55 @@ function getQuestions() {
 
     var questions = localStorage.getItem('questionsMaster');
     this.questions = JSON.parse(questions);
+
+    var answersSolutions = localStorage.getItem('answersSolutionStudent');
+    this.answersSolutionStudent = JSON.parse(answersSolutions);
+
     this.numQuestions = this.questions.length;
 
-    this.questions.forEach(question => {
+    var questionsAnswered = this.answersSolutionStudent.filter(function (answerSol) {
+        return this.userLogged.name === answerSol.student;
+    });
+
+    var questionsWithAnswer = [];
+
+    this.questions.map(function (question) {
+        questionsAnswered.map(function (questionAnsweredStudent) {
+            if (question.id === questionAnsweredStudent.idQuestion) {
+                questionsWithAnswer.push(question);
+            }
+        });
+    });
+
+    var idQuestionsAnswered = [];
+    questionsAnswered.forEach(qAns => {
+        idQuestionsAnswered.push(qAns.idQuestion);
+    });
+
+    var questionsWithoutAnswer = this.questions.filter(function (question) {
+        return !idQuestionsAnswered.includes(question.id);
+    });
+
+    questionsWithAnswer.forEach(question => {
+        var isAvailable = question.available;
+        if (isAvailable) {
+            var checked = isAvailable ? 'checked' : '';
+            var textChecked = isAvailable ? 'Available' : 'Not available';
+            var blockQuestion = "<div class='col s12 m6 hoverable' id='" + question["title"] + "'>" +
+                "<div class='card blue-grey darken-1'>" +
+                "<div class='card-content white-text'>" +
+                "<span class='card-title'>" + question["title"] + "</span>" +
+                "</div>" +
+                "<div class='card-action'>" +
+                "<a href='#' onclick='viewThisQuestion(" + question["id"] + ")'><i class='material-icons'>visibility</i> View</a>" +
+                "</div>" +
+                "</div>" +
+                "</div>";
+            $('#containerQuestionsAnswered').append(blockQuestion);
+        }
+    });
+
+    questionsWithoutAnswer.forEach(question => {
         var isAvailable = question.available;
         if (isAvailable) {
             var checked = isAvailable ? 'checked' : '';

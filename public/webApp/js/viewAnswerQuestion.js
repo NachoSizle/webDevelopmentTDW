@@ -3,11 +3,14 @@ window.onload = function () {
 };
 
 var userLogged = null;
-var proposeSolutions = [];
+var proposedSolution = null;
+var answerSolutionStudent = [];
 var questionSelected = null;
 var numSolutions = 0;
 var actualSolution = null;
-var proposedRationing = null;
+var numProposeRationingsAnswered = 0;
+var numRationingsAnswered = 0;
+var totalNumRationings = 0;
 
 function init() {
     initElements();
@@ -26,24 +29,29 @@ function initElements() {
 
 function loadInitValues() {
     loadProfile();
-    checkIfHasProposeSolution();
 }
 
 function loadProfile() {
     if (supportsHTML5Storage()) {
         var user = localStorage.getItem('userLogged');
         this.userLogged = JSON.parse(user);
-        var proposeSol = localStorage.getItem('proposeSolutions');
-        this.proposeSolutions = JSON.parse(proposeSol);
-        if (this.proposeSolutions.length === 0) {
-            $('#proposedSolutionsContainer').removeClass('scale-in').addClass('scale-out');
-            $('#proposedSolutionsContainer').height(0);
-        }
         var question = localStorage.getItem('questionSelected');
         this.questionSelected = JSON.parse(question);
+        var answerResponse = localStorage.getItem('answersSolutionStudent');
+        this.answersSolutionStudent = JSON.parse(answerResponse);
 
         this.incorrectSolutions = this.questionSelected.solutions;
+        this.totalNumRationings = calcTotalNumRationings();
+        console.log(this.totalNumRationings);
     }
+}
+
+function calcTotalNumRationings() {
+    var numRationings = 0;
+    this.incorrectSolutions.forEach(incorrectSolutions => {
+        numRationings += incorrectSolutions.rationings.length;
+    });
+    return numRationings;
 }
 
 function supportsHTML5Storage() {
@@ -65,64 +73,44 @@ function addSolution() {
     var proposeSolutionTA = $('#questionProposeSolutionTA').val();
     $('#questionProposeSolutionTA').val('');
 
-    var proposeSolutionObj = {
-        "proposeSolution": proposeSolutionTA,
-        "question": this.questionSelected.title,
-        "student": this.userLogged.name,
-        "idQuestion": this.questionSelected.id
-    };
+    this.proposedSolution = proposeSolutionTA;
 
-    this.proposeSolutions.push(proposeSolutionObj);
-
-    saveProposeSolution();
-    checkIfHasProposeSolution();
-}
-
-function saveProposeSolution() {
-    localStorage.setItem('proposeSolutions', JSON.stringify(this.proposeSolutions));
-}
-
-function checkIfHasProposeSolution() {
-    this.proposeSolutions.map(function (proposeSol) {
-        this.hasProposeSolution = this.questionSelected.id === proposeSol.idQuestion;
-
-        if (this.hasProposeSolution) {
-            $('#porposeSolutionText').text(proposeSol.proposeSolution);
-            $('#btnAddProposeSolution').addClass('disabled');
-            $('#proposedSolutionsContainer').removeClass('scale-out').addClass('scale-in');
-            $('#proposedSolutionsContainer').height('auto');
-
-            checkIfQuestionHasFollowingSolutions();
-        }
-    });
+    $('#porposeSolutionText').text(proposeSolutionTA);
+    $('#btnAddProposeSolution').addClass('disabled');
+    $('#proposedSolutionsContainer').removeClass('scale-out').addClass('scale-in');
+    $('#proposedSolutionsContainer').height('auto');
+    checkIfQuestionHasFollowingSolutions();
 }
 
 function checkIfQuestionHasFollowingSolutions() {
+    if (this.incorrectSolutions.length > 0) {
+        this.incorrectSolutions.map(function (actualSolution) {
+            console.log(actualSolution);
+            var incorrectSolutionObj = "<div class='card horizontal' id='cardActualSolution" + actualSolution.id + "'>" +
+                "<div class='card-stacked'>" +
+                "<div class='card-content pad10'>" +
+                "<span class='right'>" +
+                "<i class='material-icons' id='resValidateAnswer" + actualSolution.id + "'></i>" +
+                "</span>" +
+                "<p>" + actualSolution.title + "</p>" +
+                "</div>" +
+                "<div class='card-action' id='actionFollowingSolution" + actualSolution.id + "'>" +
+                "<label>" +
+                "<input id='itsNotCorrectAnswer" + actualSolution.id + "' type='checkbox'/>" +
+                "<span>It's not correct</span>" +
+                "</label>" +
+                "<a href='#' onclick='validateAnswer(" + actualSolution.id + ")' class='right'>Validate!</a>" +
+                "</div>" +
+                "</div>" +
+                "</div>";
 
-    this.incorrectSolutions.map(function (actualSolution) {
-        console.log(actualSolution);
-        var incorrectSolutionObj = "<div class='card horizontal' id='cardActualSolution" + actualSolution.id + "'>" +
-            "<div class='card-stacked'>" +
-            "<div class='card-content pad10'>" +
-            "<span class='right'>" +
-            "<i class='material-icons' id='resValidateAnswer" + actualSolution.id + "'></i>" +
-            "</span>" +
-            "<p>" + actualSolution.title + "</p>" +
-            "</div>" +
-            "<div class='card-action' id='actionFollowingSolution" + actualSolution.id + "'>" +
-            "<label>" +
-            "<input id='itsNotCorrectAnswer" + actualSolution.id + "' type='checkbox'/>" +
-            "<span>It's not correct</span>" +
-            "</label>" +
-            "<a href='#' onclick='validateAnswer(" + actualSolution.id + ")' class='right'>Validate!</a>" +
-            "</div>" +
-            "</div>" +
-            "</div>";
-
-        $('#containerAllFollowingSolutions').append(incorrectSolutionObj);
-    });
-    $('#followingSolutionContainer').removeClass('scale-out').addClass('scale-in');
-    $('#followingSolutionContainer').height('auto');
+            $('#containerAllFollowingSolutions').append(incorrectSolutionObj);
+        });
+        $('#followingSolutionContainer').removeClass('scale-out').addClass('scale-in');
+        $('#followingSolutionContainer').height('auto');
+    } else {
+        finishQuestion();
+    }
 }
 
 function validateAnswer(idSolution) {
@@ -143,6 +131,12 @@ function validateAnswer(idSolution) {
         }
         $('#resValidateAnswer' + idSolution).addClass('incorrectAnswer');
     }
+    var proposeSolutionStudentAnswer = {
+        "answer": itsNotCorrect,
+        "followingSolution": this.incorrectSolutions[idSolution],
+        "idAnswer": this.incorrectSolutions[idSolution].id
+    };
+    this.answerSolutionStudent.push(proposeSolutionStudentAnswer);
     showContainerAnswerRationing(idSolution);
 }
 
@@ -174,19 +168,29 @@ function saveProposeRationing(idSolution) {
     $('#textHeaderProposeRationing' + idSolution).text('Your proposed rationing: ');
     $('#textProposeRationing' + idSolution).text(proposedRationing);
 
-    this.proposedRationing = {
+    var proposedRationingAnswer = {
         "proposedRationing": proposedRationing,
         "idSolution": idSolution,
         "user": this.userLogged.user,
-
     };
+
+    addProposeRationingToAnswer(proposedRationingAnswer);
 
     $('#actionSaveProposeRationing' + idSolution).prop('hidden', true);
 
     showAllIncorrectSolutions(idSolution);
 }
 
+function addProposeRationingToAnswer(proposedRationingAnswer) {
+    this.answerSolutionStudent.forEach(answer => {
+        if (answer.idAnswer === proposedRationingAnswer.idSolution) {
+            answer["proposeRationing"] = proposedRationingAnswer;
+        }
+    });
+}
+
 function showAllIncorrectSolutions(idSolution) {
+    this.numProposeRationingsAnswered++;
     if (this.incorrectSolutions[idSolution].rationings.length > 0) {
         this.incorrectSolutions[idSolution].rationings.map(function (rationing) {
             var incorrectSolutionObj = "<div class='card horizontal checkRationing' id='cardActualRationing" + rationing.id + "'>" +
@@ -232,10 +236,54 @@ function validateRationing(idRationing, idSolution) {
         }
         $('#resValidateAnswerRationing' + idRationing).addClass('incorrectAnswer');
     }
+
+    var justifyRationingAnswer = {
+        "idRationing": idRationing,
+        "idSolution": idSolution,
+        "answer": justifyRationing
+    };
+
+    saveResponseRationing(justifyRationingAnswer);
+    finishThisFollowingRationing(idRationing);
+}
+
+function saveResponseRationing(justifyRationingStudentAnswer) {
+    this.numRationingsAnswered++;
+    this.answerSolutionStudent.forEach(answer => {
+        if (answer.idAnswer === justifyRationingStudentAnswer.idSolution) {
+            if (answer["proposedRationingsAnswers"] === undefined) {
+                answer["proposedRationingsAnswers"] = [];
+            }
+            answer["proposedRationingsAnswers"].push(justifyRationingStudentAnswer);
+        }
+    });
+
+    if (this.numProposeRationingsAnswered === this.incorrectSolutions.length &&
+        this.numRationingsAnswered === this.totalNumRationings) {
+        finishQuestion();
+    }
+}
+
+function finishThisFollowingRationing(idRationing) {
+    $('#actionRationingSolution' + idRationing).prop('hidden', true);
 }
 
 function finishThisFollowingSolution(idSolution) {
     $('#actionFollowingSolution' + idSolution).prop('hidden', true);
+}
+
+function finishQuestion() {
+    var answerToSave = {
+        "question": this.questionSelected.title,
+        "student": this.userLogged.name,
+        "idQuestion": this.questionSelected.id,
+        "proposedSolution": this.proposedSolution,
+        "answers": this.answerSolutionStudent
+    }
+
+    this.answersSolutionStudent.push(answerToSave);
+    localStorage.setItem('answersSolutionStudent', JSON.stringify(this.answersSolutionStudent));
+    $('#finishModal').modal('open');
 }
 
 function backToPreviousPage() {

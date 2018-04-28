@@ -1,0 +1,25 @@
+body,
+html {
+    height: 100%;
+}
+
+.secondTitle {
+    margin-left: 10px;
+}
+
+.pad10 {
+    padding: 10px !important;
+}
+
+.collapsible-body {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+}
+
+.noMarginTop {
+    margin-top: 0px !important;
+}
+
+.noMarginBottom {
+    margin-bottom: 0px !important;
+}
