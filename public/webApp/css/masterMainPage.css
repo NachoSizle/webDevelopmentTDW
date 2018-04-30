@@ -19,3 +19,18 @@ html {
 .card-content span {
     color: #fff !important;
 }
+
+.linkBtnCard {
+    position: relative;
+    bottom: 5px;
+    font-size: 11px !important;
+}
+
+.iconBtnCard {
+    position: relative;
+    bottom: -7px;
+}
+
+.noPadBottom {
+    padding-bottom: 0px !important;
+}

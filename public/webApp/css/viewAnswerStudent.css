@@ -3,6 +3,7 @@ html {
     height: 100%;
 }
 
+.firstTitle,
 .secondTitle {
     margin-left: 10px;
 }
@@ -22,4 +23,12 @@ html {
 
 .noMarginBottom {
     margin-bottom: 0px !important;
+}
+
+.correctAnswer {
+    color: #388e3c;
+}
+
+.incorrectAnswer {
+    color: #d32f2f;
 }

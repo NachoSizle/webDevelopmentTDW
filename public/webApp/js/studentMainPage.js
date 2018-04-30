@@ -64,7 +64,14 @@ function getQuestions() {
 
     this.questions.map(function (question) {
         questionsAnswered.map(function (questionAnsweredStudent) {
-            if (question.id === questionAnsweredStudent.idQuestion) {
+            var idQuestionsAns = questionAnsweredStudent.idQuestion;
+            //tenemos que quitar las preguntas que han sido respondidas por el estudiante 
+            //y comprobar si ha contestado a todas las soluciones
+            //En el caso de que haya una solucion nueva, deberemos responderla
+            if (question.id === idQuestionsAns) {
+                if (questionAnsweredStudent.answers.length === question.solutions.length) {
+                    console.log("Student response all questions!!!");
+                }
                 questionsWithAnswer.push(question);
             }
         });
@@ -84,13 +91,10 @@ function getQuestions() {
         if (isAvailable) {
             var checked = isAvailable ? 'checked' : '';
             var textChecked = isAvailable ? 'Available' : 'Not available';
-            var blockQuestion = "<div class='col s12 m6 hoverable' id='" + question["title"] + "'>" +
+            var blockQuestion = "<div class='col s12 m12 hoverable' id='" + question["title"] + "'>" +
                 "<div class='card blue-grey darken-1'>" +
                 "<div class='card-content white-text'>" +
                 "<span class='card-title'>" + question["title"] + "</span>" +
-                "</div>" +
-                "<div class='card-action'>" +
-                "<a href='#' onclick='viewThisQuestion(" + question["id"] + ")'><i class='material-icons'>visibility</i> View</a>" +
                 "</div>" +
                 "</div>" +
                 "</div>";

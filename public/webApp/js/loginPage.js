@@ -66,9 +66,9 @@ function saveDataToLS() {
     }
 
     var proposeSolutions = [];
-    var proposeSolutionsLS = localStorage.getItem('proposeSolutions');
+    var proposeSolutionsLS = localStorage.getItem('answersSolutionStudent');
     if (proposeSolutionsLS === null || proposeSolutionsLS.length === 0) {
-        localStorage.setItem('proposeSolutions', JSON.stringify(proposeSolutions));
+        localStorage.setItem('answersSolutionStudent', JSON.stringify(proposeSolutions));
     }
 }
 

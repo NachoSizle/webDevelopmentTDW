@@ -213,6 +213,9 @@ function showAllIncorrectSolutions(idSolution) {
 
             $('#containerProposedRationing' + idSolution).after(incorrectSolutionObj);
         });
+    } else if (this.numProposeRationingsAnswered === this.incorrectSolutions.length &&
+        this.numRationingsAnswered === this.totalNumRationings) {
+        finishQuestion();
     }
 }
 

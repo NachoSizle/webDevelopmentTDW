@@ -4,9 +4,8 @@ window.onload = function () {
 
 var userLogged = null;
 var questionSelected = null;
-var proposedSolutions = [];
-var proposedSolutionToQuestionSelected = [];
-var numProposedSolutions = 0;
+var answersSolutionStudents = [];
+var proposedSolutionToQuestionSelected = null;
 
 function init() {
     $('#goodSolutionCheck').click(function () {
@@ -42,8 +41,8 @@ function loadData() {
         this.userLogged = JSON.parse(user);
         var question = localStorage.getItem('questionSelected');
         this.questionSelected = JSON.parse(question);
-        var proposeSol = localStorage.getItem('proposeSolutions');
-        this.proposedSolutions = JSON.parse(proposeSol);
+        var ansSolStudent = localStorage.getItem('answersSolutionStudent');
+        this.answersSolutionStudents = JSON.parse(ansSolStudent);
     }
 }
 
@@ -56,33 +55,102 @@ function supportsHTML5Storage() {
 }
 
 function setDataToPage() {
-    this.proposedSolutionToQuestionSelected = this.proposedSolutions.filter(function (propSol) {
+    this.proposedSolutionToQuestionSelected = this.answersSolutionStudents.filter(function (propSol) {
         return propSol.idQuestion === this.questionSelected.id;
     });
-    this.numProposedSolutions = this.proposedSolutionToQuestionSelected.length;
+
+    $('.firstTitle').text('Question: ' + this.questionSelected.title);
     setAnswersToCollapsible();
 }
 
 function setAnswersToCollapsible() {
-    if (this.numProposedSolutions > 0) {
+    if (this.proposedSolutionToQuestionSelected.length > 0) {
         $('#noAnswers').attr('hidden');
-        this.proposedSolutionToQuestionSelected.map(function (propSolution) {
+        this.proposedSolutionToQuestionSelected.map(function (propSolution, index) {
+            console.log(propSolution);
+            var structFollowingSolutions = getAnswersFromFollowingSolutions(propSolution.answers);
             var structSolution = "<li>" +
                 "<div class='collapsible-header' onclick='changeAnswerSelected(" + propSolution.idQuestion + ")'>" +
                 "<i class='material-icons'>filter_drama</i>" + propSolution.student + "</div>" +
                 "<div class='collapsible-body'>" +
-                "<h5>Answer: " + propSolution.proposeSolution + "</h5>" +
-                "<div class='row buttonRationing'>" +
-                "<a href='#addRationing' class='modal-trigger'>Add Rationing</a>" +
-                "<a href='#' onclick='showRationing(" + propSolution.idQuestion + ")'>Show rationings</a>" +
-                "</div>" +
+                "<h5>Answer: " + propSolution.proposedSolution + "</h5>" +
+                "<div id='answersFromStudent" + index + "'></div>" +
                 "</div>" +
                 "</li>";
-            $('#collapsibleOfAnswers').append(structSolution)
+            $('#collapsibleOfAnswers').append(structSolution);
+            structFollowingSolutions.forEach(struct => {
+                $('#answersFromStudent' + index).append(struct);
+            });
         });
     } else {
         $('#noAnswers').removeAttr('hidden');
     }
+}
+
+function getAnswersFromFollowingSolutions(answers) {
+    var numSolutions = answers.length;
+    var structFollowingSolutions = [];
+    answers.map(function (answerStudent) {
+        var struct = null;
+        //Cogemos el titulo de la following solution
+        var followingSolutionTitle = answerStudent.followingSolution.title;
+        var stateFollowingSolution = answerStudent.followingSolution.isGood;
+        var answerFollowingSolution = answerStudent.answer;
+        //Hay que comprobar si el estudiante acerto o fallo a la following solution
+        var typeIcon = answerFollowingSolution === stateFollowingSolution ? 'check_circle' : 'cancel';
+        var correctAnswer = answerFollowingSolution === stateFollowingSolution ? 'correctAnswer' : 'incorrectAnswer';
+
+        //Ahora cogemos el razonamiento que dio el estudiante cuando contesto a la following solution
+        var proposedRationing = answerStudent.proposeRationing.proposedRationing;
+
+        struct = "<div class='containerFollowingSolution'>" +
+            "<div class='followingSolution'>" +
+            "<span class='right'>" +
+            "<i class='material-icons " + correctAnswer + "'>" + typeIcon + "</i>" +
+            "</span>" +
+            "<h5 class='titleFollowingSolution'> Solution " + answerStudent.idAnswer + ": " + followingSolutionTitle + "</h5>" +
+            "<p class='proposedRationingFollowingSolution'>Proposed rationing: " + proposedRationing + "</p>";
+        //Comprobamos si la solucion tiene razonamientos que el estudiante ha respondido
+        if (answerStudent.followingSolution.rationings.length > 0) {
+            var structsRationgins = getFollowingRationings(answerStudent);
+            struct += structsRationgins;
+        }
+        struct += "</div>" +
+            "</div>";
+        structFollowingSolutions.push(struct);
+    });
+    //Hay que juntar los resultados que hemos obtenido en una estrutura HTML para aniadirla
+    return structFollowingSolutions;
+}
+
+function getFollowingRationings(answerStudent) {
+    var struct = "<div class='containerFollowingRationings'>";
+    answerStudent.followingSolution.rationings.forEach(rationing => {
+        var stateRationing = rationing.justifyRationing;
+        var titleRationing = rationing.title;
+        var rationingStudent = answerStudent.proposedRationingsAnswers.filter(function (propRatio) {
+            return propRatio.idRationing === rationing.id;
+        });
+        var answerRationingStudent = false;
+        if (rationingStudent !== undefined && rationingStudent !== null) {
+            answerRationingStudent = rationingStudent[0].answer;
+        };
+        //Hay que comprobar si el estudiante acerto o fallo a la following solution
+        var typeIcon = answerRationingStudent === stateRationing ? 'check_circle' : 'cancel';
+        var correctAnswer = answerRationingStudent === stateRationing ? 'correctAnswer' : 'incorrectAnswer';
+
+        var structRatio = "<div class='followingRationing'>" +
+            "<span class='right'>" +
+            "<i class='material-icons " + correctAnswer + "'>" + typeIcon + "</i>" +
+            "</span>" +
+            "<h5 class='titleFollowingSolution'> Rationing " + rationing.id + ": " + titleRationing + "</h5>" +
+            "</div>";
+        struct += structRatio;
+    });
+
+    struct += "</div>";
+
+    return struct;
 }
 
 function changeAnswerSelected(idPropSolution) {

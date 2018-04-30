@@ -64,17 +64,17 @@ function getQuestions() {
         var textChecked = question.available ? 'Available' : 'Not available';
         var blockQuestion = "<div class='col s12 m6 hoverable' id='" + question["title"] + "'>" +
             "<div class='card blue-grey darken-1'>" +
-            "<div class='card-content white-text'>" +
+            "<div class='card-content white-text noPadBottom'>" +
             "<span class='card-title'>" + question["title"] + "</span>" +
             "<label>" +
             "<input type='checkbox'" + checked + " disabled/>" +
             "<span>" + textChecked + "</span>" +
             "</label>" +
             "</div>" +
-            "<div class='card-action'>" +
-            "<a href='#' onclick='viewThisQuestion(" + question["id"] + ")'><i class='material-icons'>visibility</i> View</a>" +
-            "<a href='#remModal' onclick='setQuestion(" + question["id"] + ")' class='modal-trigger'><i class='material-icons'>delete_forever</i> Remove</a>" +
-            "<a href='#' onclick='viewAnswerFromStudents(" + question["id"] + ")'><i class='material-icons'>visibility</i> View Answers</a>" +
+            "<div class='card-action col s12 m12'>" +
+            "<a href='#' onclick='viewThisQuestion(" + question["id"] + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View</a>" +
+            "<a href='#remModal' onclick='setQuestion(" + question["id"] + ")' class='modal-trigger linkBtnCard'><i class='material-icons iconBtnCard'>delete_forever</i>Remove</a>" +
+            "<a href='#' onclick='viewAnswerFromStudents(" + question["id"] + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View Answers</a>" +
             "</div>" +
             "</div>" +
             "</div>";
