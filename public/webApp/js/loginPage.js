@@ -22,18 +22,28 @@ function saveDataToLS() {
     var usersMock = [{
             "name": "Nacho",
             "user": "nacho",
+            "idUser": 010,
+            "password": "qwerty",
+            "role": "student"
+        },
+        {
+            "name": "Adrian",
+            "user": "adrian",
+            "idUser": 123,
             "password": "qwerty",
             "role": "student"
         },
         {
             "name": "Borja",
             "user": "borja",
+            "idUser": 245,
             "password": "qwerty",
             "role": "student"
         },
         {
             "name": "Luis",
             "user": "luis",
+            "idUser": 367,
             "password": "qwerty",
             "role": "master"
         }
@@ -50,13 +60,13 @@ function saveDataToLS() {
         {
             "title": "¿Que es un lenguaje tipado?",
             "id": 1,
-            "available": true,
+            "available": false,
             "solutions": []
         },
         {
             "title": "¿Que es la recursividad?",
             "id": 2,
-            "available": true,
+            "available": false,
             "solutions": []
         }
     ];
