@@ -67,7 +67,6 @@ function setAnswersToCollapsible() {
     if (this.proposedSolutionToQuestionSelected.length > 0) {
         $('#noAnswers').attr('hidden');
         this.proposedSolutionToQuestionSelected.map(function (propSolution, index) {
-            console.log(propSolution);
             var structFollowingSolutions = getAnswersFromFollowingSolutions(propSolution.answers);
             var structSolution = "<li>" +
                 "<div class='collapsible-header' onclick='changeAnswerSelected(" + propSolution.idQuestion + ")'>" +
@@ -92,15 +91,12 @@ function getAnswersFromFollowingSolutions(answers) {
     var structFollowingSolutions = [];
     answers.map(function (answerStudent) {
         var struct = null;
-        //Cogemos el titulo de la following solution
         var followingSolutionTitle = answerStudent.followingSolution.title;
         var stateFollowingSolution = answerStudent.followingSolution.isGood;
         var answerFollowingSolution = answerStudent.answer;
-        //Hay que comprobar si el estudiante acerto o fallo a la following solution
         var typeIcon = answerFollowingSolution === stateFollowingSolution ? 'check_circle' : 'cancel';
         var correctAnswer = answerFollowingSolution === stateFollowingSolution ? 'correctAnswer' : 'incorrectAnswer';
 
-        //Ahora cogemos el razonamiento que dio el estudiante cuando contesto a la following solution
         var proposedRationing = answerStudent.proposeRationing.proposedRationing;
 
         struct = "<div class='containerFollowingSolution'>" +
@@ -110,7 +106,6 @@ function getAnswersFromFollowingSolutions(answers) {
             "</span>" +
             "<h5 class='titleFollowingSolution'> Solution " + answerStudent.idAnswer + ": " + followingSolutionTitle + "</h5>" +
             "<p class='proposedRationingFollowingSolution'>Proposed rationing: " + proposedRationing + "</p>";
-        //Comprobamos si la solucion tiene razonamientos que el estudiante ha respondido
         if (answerStudent.followingSolution.rationings.length > 0) {
             var structsRationgins = getFollowingRationings(answerStudent);
             struct += structsRationgins;
@@ -119,7 +114,6 @@ function getAnswersFromFollowingSolutions(answers) {
             "</div>";
         structFollowingSolutions.push(struct);
     });
-    //Hay que juntar los resultados que hemos obtenido en una estrutura HTML para aniadirla
     return structFollowingSolutions;
 }
 
@@ -135,7 +129,6 @@ function getFollowingRationings(answerStudent) {
         if (rationingStudent !== undefined && rationingStudent !== null) {
             answerRationingStudent = rationingStudent[0].answer;
         };
-        //Hay que comprobar si el estudiante acerto o fallo a la following solution
         var typeIcon = answerRationingStudent === stateRationing ? 'check_circle' : 'cancel';
         var correctAnswer = answerRationingStudent === stateRationing ? 'correctAnswer' : 'incorrectAnswer';
 
@@ -155,7 +148,6 @@ function getFollowingRationings(answerStudent) {
 
 function changeAnswerSelected(idPropSolution) {
     /*
-    console.log("CHANGE!!!");
     this.solutionSelected = this.questionSelected.solutions.filter(function (solution) {
         return solution.id === idSolution;
     });

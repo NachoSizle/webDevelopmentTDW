@@ -54,19 +54,19 @@ function saveDataToLS() {
     var questionsMasterMock = [{
             "title": "¿Que es el software?",
             "id": 0,
-            "available": false,
+            "available": true,
             "solutions": []
         },
         {
             "title": "¿Que es un lenguaje tipado?",
             "id": 1,
-            "available": false,
+            "available": true,
             "solutions": []
         },
         {
             "title": "¿Que es la recursividad?",
             "id": 2,
-            "available": false,
+            "available": true,
             "solutions": []
         }
     ];
@@ -79,6 +79,12 @@ function saveDataToLS() {
     var proposeSolutionsLS = localStorage.getItem('answersSolutionStudent');
     if (proposeSolutionsLS === null || proposeSolutionsLS.length === 0) {
         localStorage.setItem('answersSolutionStudent', JSON.stringify(proposeSolutions));
+    }
+
+    var solutionsToReview = [];
+    var solutionsToReviewLS = localStorage.getItem('solutionsToReview');
+    if (solutionsToReviewLS === null || solutionsToReviewLS.length === 0) {
+        localStorage.setItem('solutionsToReview', JSON.stringify(solutionsToReview));
     }
 }
 

@@ -6,6 +6,7 @@ var userLogged = null;
 var questions = [];
 var numQuestions = 0;
 var questionSelected = null;
+var solutionsToReview = [];
 
 function init() {
     initElements();
@@ -27,14 +28,13 @@ function initElements() {
     });
 }
 
-function onCloseTapTarget() {
-    console.log('close');
-}
-
 function loadProfile() {
     if (supportsHTML5Storage()) {
         var user = localStorage.getItem('userLogged');
         this.userLogged = JSON.parse(user);
+
+        var solutionsReview = localStorage.getItem('solutionsToReview');
+        this.solutionsToReview = JSON.parse(solutionsReview);
         setDataToPage();
     }
 }
@@ -62,6 +62,7 @@ function getQuestions() {
     this.questions.forEach(question => {
         var checked = question.available ? 'checked' : '';
         var textChecked = question.available ? 'Available' : 'Not available';
+        var hasSolutionToReview = getSolutionProposedToQuestion(question.id) ? '' : 'hidden';
         var blockQuestion = "<div class='col s12 m6 hoverable' id='" + question["title"] + "'>" +
             "<div class='card blue-grey darken-1'>" +
             "<div class='card-content white-text noPadBottom'>" +
@@ -75,6 +76,7 @@ function getQuestions() {
             "<a href='#' onclick='viewThisQuestion(" + question["id"] + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View</a>" +
             "<a href='#remModal' onclick='setQuestion(" + question["id"] + ")' class='modal-trigger linkBtnCard'><i class='material-icons iconBtnCard'>delete_forever</i>Remove</a>" +
             "<a href='#' onclick='viewAnswerFromStudents(" + question["id"] + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View Answers</a>" +
+            "<a href='#' " + hasSolutionToReview + " onclick='reviewAnswerFromStudents(" + question["id"] + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>sim_card_alert</i>Review answers</a>" +
             "</div>" +
             "</div>" +
             "</div>";
@@ -82,8 +84,21 @@ function getQuestions() {
     });
 }
 
-function getIsChecked(question) {
-    console.log(question);
+function getSolutionProposedToQuestion(idQuestion) {
+    var hasSolutionToReview = false;
+    if (this.solutionsToReview.length > 0) {
+        this.solutionsToReview.forEach(solution => {
+            if (solution.idQuestion === idQuestion) {
+                hasSolutionToReview = true;
+            }
+        });
+    }
+    return hasSolutionToReview;
+}
+
+function reviewAnswerFromStudents(questionId) {
+    setSelectedQuestion(questionId);
+    window.location.href = "./reviewAnswerStudent.html";
 }
 
 function viewAnswerFromStudents(questionId) {

@@ -77,7 +77,7 @@ function setSolutionsToCollapsible() {
     if (this.numSolutions > 0) {
         $('#noSolutions').attr('hidden');
         this.questionSelected.solutions.map(function (sol) {
-            var checked = sol.isGood ? '' : 'checked';
+            var checked = sol.isGood ? 'checked' : '';
             var hidden = sol.isGood ? '' : 'hidden';
             var structSolution = "<li>" +
                 "<div class='collapsible-header' onclick='changeSolutionSelected(" + sol.id + ")'>" +
@@ -103,7 +103,6 @@ function setSolutionsToCollapsible() {
 }
 
 function changeSolutionSelected(idSolution) {
-    console.log("CHANGE!!!");
     this.solutionSelected = this.questionSelected.solutions.filter(function (solution) {
         return solution.id === idSolution;
     });
@@ -138,9 +137,6 @@ function addSolution() {
     };
 
     if (isBadSolution) {
-        //Se necesita que el usuario introduzca un racionamiento a la solucion. 
-        //Si se indica que es correcto, se debe meter una justificacion.
-        console.log("Is bad solution");
         var solutionRationingTA = $('#questionRationingTA').val();
         $('#questionRationingTA').val('');
 
@@ -162,15 +158,10 @@ function addSolution() {
     this.questionSelected.solutions.push(solutionObj);
     this.editSolutionMode = false;
 
-    console.log(this.questionSelected);
     saveQuestion();
 }
 
 function addRationing() {
-    console.log("Set rationing");
-    //Añadimos el razonamiento a los razonamientos que tenemos en solucionSelected[0]
-    console.log(this.solutionSelected[0]);
-
     var solutionAddRationingTA = $('#questionAddRationingTA').val();
     $('#questionAddRationingTA').val('');
 
@@ -188,7 +179,6 @@ function addRationing() {
 }
 
 function showRationing(idSolution) {
-    console.log("Show rationings");
     $('#rationingsContainer').toggle("slow");
     if (this.numRationings > 0) {
         $('.ration').remove();

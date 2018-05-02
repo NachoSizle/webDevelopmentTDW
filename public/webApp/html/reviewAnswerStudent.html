@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="./../css/materialize.css" media="screen,projection">
+    <link rel="stylesheet" href="./../css/reviewAnswerStudent.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Review Student Answers</title>
+</head>
+
+<body>
+
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#!" class="brand-logo">Review Answers</a>
+            <a href="#" data-target="mobile-demo" class="sidenav-trigger">
+                <i class="material-icons">menu</i>
+            </a>
+            <ul class="right hide-on-med-and-down">
+                <li>
+                    <a class="nav-link" href="./masterMainPage.html">Master Page</a>
+                </li>
+                <li>
+                    <a class="nav-link" href="./../index.html" onclick="logout()">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <ul class="sidenav" id="mobile-demo">
+        <li>
+            <a class="nav-link" href="./masterMainPage.html">Master Page</a>
+        </li>
+        <li>
+            <a class="nav-link" href="./../index.html" onclick="logout()">Logout</a>
+        </li>
+    </ul>
+
+    <div class="mainContainer">
+        <h4 class="firstTitle"></h4>
+        <h5 class="secondTitle">Select student to review answers</h5>
+        <div class="row" id="containerAnswers">
+            <div class="col s12 m12" id="answersContainer">
+                <ul class="collapsible popout" id="collapsibleOfAnswers">
+                    <li id="noAnswers" hidden>
+                        <div class='collapsible-header'>
+                            <i class='material-icons'>cancel</i>No answers yet!
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="askTypeQuestion" class="modal">
+        <div class="modal-content">
+            <h4>The question is correct?</h4>
+            <div class="input-field col s12">
+                <label class="lblAvailable">
+                    <input id="checkTypeSolution" type="checkbox" />
+                    <span>Correct</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <a onclick="addSolutionToBatery()" class="modal-action modal-close waves-effect waves-green btn-flat">Add!</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js " integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN "
+        crossorigin="anonymous "></script>
+    <script src="./../js/materialize.js "></script>
+    <script src="./../js/reviewAnswerStudent.js "></script>
+</body>
+
+</html>

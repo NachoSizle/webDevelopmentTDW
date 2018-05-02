@@ -3,6 +3,7 @@ window.onload = function () {
 };
 
 var answersSolutionStudent = [];
+var studentAnsweredAllQuestions = false;
 
 function init() {
     initElements();
@@ -65,13 +66,8 @@ function getQuestions() {
     this.questions.map(function (question) {
         questionsAnswered.map(function (questionAnsweredStudent) {
             var idQuestionsAns = questionAnsweredStudent.idQuestion;
-            //tenemos que quitar las preguntas que han sido respondidas por el estudiante 
-            //y comprobar si ha contestado a todas las soluciones
-            //En el caso de que haya una solucion nueva, deberemos responderla
+
             if (question.id === idQuestionsAns) {
-                if (questionAnsweredStudent.answers.length === question.solutions.length) {
-                    console.log("Student response all questions!!!");
-                }
                 questionsWithAnswer.push(question);
             }
         });
@@ -113,13 +109,18 @@ function getQuestions() {
                 "<span class='card-title'>" + question["title"] + "</span>" +
                 "</div>" +
                 "<div class='card-action'>" +
-                "<a href='#' onclick='viewThisQuestion(" + question["id"] + ")'><i class='material-icons'>visibility</i> View</a>" +
+                "<a href='#' onclick='viewThisQuestion(" + question["id"] + ")'><i class='material-icons alignToText'>visibility</i> Answer!</a>" +
                 "</div>" +
                 "</div>" +
                 "</div>";
             $('#containerQuestions').append(blockQuestion);
         }
     });
+
+    var textQuestionsAnswered = questionsWithAnswer.length === 0 ? 'You have not answered any questions yet' : 'Questions answered!';
+    var textQuestionsAvailable = questionsWithoutAnswer.length === 0 ? 'Congratulations! You have answered all the questions.' : 'Questions available!';
+    $('#headerAvailableQuestions').text(textQuestionsAvailable);
+    $('#headerAnsweredQuestions').text(textQuestionsAnswered);
 }
 
 function viewThisQuestion(questionId) {
