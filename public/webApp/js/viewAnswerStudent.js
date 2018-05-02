@@ -69,7 +69,7 @@ function setAnswersToCollapsible() {
         this.proposedSolutionToQuestionSelected.map(function (propSolution, index) {
             var structFollowingSolutions = getAnswersFromFollowingSolutions(propSolution.answers);
             var structSolution = "<li>" +
-                "<div class='collapsible-header' onclick='changeAnswerSelected(" + propSolution.idQuestion + ")'>" +
+                "<div class='collapsible-header'>" +
                 "<i class='material-icons'>filter_drama</i>" + propSolution.student + "</div>" +
                 "<div class='collapsible-body'>" +
                 "<h5>Answer: " + propSolution.proposedSolution + "</h5>" +
@@ -144,14 +144,6 @@ function getFollowingRationings(answerStudent) {
     struct += "</div>";
 
     return struct;
-}
-
-function changeAnswerSelected(idPropSolution) {
-    /*
-    this.solutionSelected = this.questionSelected.solutions.filter(function (solution) {
-        return solution.id === idSolution;
-    });
-    */
 }
 
 function backToPreviousPage() {
