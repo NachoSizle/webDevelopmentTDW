@@ -205,7 +205,7 @@ function showAllIncorrectSolutions(idSolution) {
                 "<div class='card-action' id='actionRationingSolution" + rationing.id + "'>" +
                 "<label>" +
                 "<input id='itsNotCorrectAnswerProposedRationings" + rationing.id + "' type='checkbox'/>" +
-                "<span>It's not justify</span>" +
+                "<span>It's justify</span>" +
                 "</label>" +
                 "<a href='#' onclick='validateRationing(" + rationing.id + ", " + idSolution + ")' class='right'>Validate!</a>" +
                 "</div>" +
