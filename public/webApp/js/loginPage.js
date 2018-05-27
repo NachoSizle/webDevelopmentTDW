@@ -111,20 +111,31 @@ function validateUser() {
     getUser();
 }
 
-function getUser(userValue, passValue) {
-    var userFound = false;
+function goToSignUpPage() {
+    window.location.href = "./html/signUp.html";
+}
+
+function getUser() {
     var userInput = $("#inputUser").val();
     var passwordInput = $("#inputPassword").val();
 
-    this.usersMock.forEach(user => {
-        if (userInput === user["user"] &&
-            passwordInput === user["password"] &&
-            !userFound) {
-            userFound = true;
-            this.userSelected = user;
-            localStorage.setItem('userLogged', JSON.stringify(user));
+    var userData = {
+        'username': $("#inputUser").val(),
+        'password': $("#inputPassword").val()
+    };
+
+    var userDataJSON = JSON.stringify(userData);
+
+    this.requestApi('POST', 'login', userDataJSON).then((response) => {
+        console.log(response);
+        if (response) {
+            this.userSelected = response['User'];
+            localStorage.setItem('userLogged', this.userSelected);
+            localStorage.setItem('X-Token', response['X-Token']);
             resolveTo();
         }
+    }).catch((err) => {
+        console.log(err);
     });
 }
 
