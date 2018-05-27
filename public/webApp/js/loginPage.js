@@ -20,29 +20,29 @@ function initElements() {
 function saveDataToLS() {
 
     var usersMock = [{
-            "name": "Nacho",
-            "user": "nacho",
+            "name": "a",
+            "user": "a",
             "idUser": 010,
             "password": "qwerty",
             "role": "student"
         },
         {
-            "name": "Adrian",
-            "user": "adrian",
+            "name": "b",
+            "user": "b",
             "idUser": 123,
             "password": "qwerty",
             "role": "student"
         },
         {
-            "name": "Borja",
-            "user": "borja",
+            "name": "c",
+            "user": "c",
             "idUser": 245,
             "password": "qwerty",
             "role": "student"
         },
         {
-            "name": "Luis",
-            "user": "luis",
+            "name": "m",
+            "user": "m",
             "idUser": 367,
             "password": "qwerty",
             "role": "master"
