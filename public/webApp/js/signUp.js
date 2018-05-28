@@ -3,6 +3,7 @@ window.onload = function () {
 };
 
 var userSelected = null;
+var userDataSignUp = null;
 var usersMock = null;
 
 function init() {
@@ -41,6 +42,7 @@ function goToSignUpPage() {
 }
 
 function signUpUser() {
+
     var userInput = $("#inputUser").val();
     var passwordInput = $("#inputPassword").val();
 
@@ -51,14 +53,16 @@ function signUpUser() {
 
     var userDataJSON = JSON.stringify(userData);
 
-    this.requestApi('POST', 'login', userDataJSON).then((response) => {
+    this.requestApi('POST', 'users', userDataJSON).then((response) => {
         console.log(response);
+        /*
         if (response) {
             this.userSelected = response['User'];
             localStorage.setItem('userLogged', this.userSelected);
             localStorage.setItem('X-Token', response['X-Token']);
             resolveTo();
         }
+        */
     }).catch((err) => {
         console.log(err);
     });
