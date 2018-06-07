@@ -42,7 +42,7 @@ function supportsHTML5Storage() {
 }
 
 function setDataToPage() {
-    $('#hiMaster')[0].innerText = "Hola " + this.userLogged["name"];
+    $('#hiMaster')[0].innerText = "Hola " + this.userLogged["username"];
     getQuestions();
 }
 

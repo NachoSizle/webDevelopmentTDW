@@ -129,9 +129,10 @@ function getUser() {
     this.requestApi('POST', 'login', userDataJSON).then((response) => {
         console.log(response);
         if (response) {
-            this.userSelected = response['User'];
-            localStorage.setItem('userLogged', this.userSelected);
-            localStorage.setItem('X-Token', response['X-Token']);
+            var resParsered = JSON.parse(response);
+            this.userSelected = resParsered['User']['usuario'];
+            localStorage.setItem('userLogged', JSON.stringify(this.userSelected));
+            localStorage.setItem('X-Token', resParsered['X-Token']);
             resolveTo();
         }
     }).catch((err) => {
@@ -140,7 +141,7 @@ function getUser() {
 }
 
 function resolveTo() {
-    if (this.userSelected["role"] === "master") {
+    if (this.userSelected["maestro"]) {
         window.location.href = "./html/masterMainPage.html";
     } else {
         window.location.href = "./html/studentMainPage.html";

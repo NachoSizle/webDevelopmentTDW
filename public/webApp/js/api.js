@@ -4,30 +4,22 @@ window.onload = function () {
 
 var pathApi = "http://localhost:8080/api/v1/";
 
-function init() {
-    initElements();
-}
-
-function initElements() {
-    $(document).ready(function () {
-        $('.sidenav').sidenav();
-    });
-}
+function init() {}
 
 function requestApi(requestMethod, route, body, token) {
     return new Promise((resolve, reject) => {
         var req = new XMLHttpRequest();
 
         req.open(requestMethod, this.pathApi + route, true);
-        req.withCredentials = false;
-        req.setRequestHeader('Access-Control-Allow-Headers', 'X-Token');
-        req.setRequestHeader('content', 'application/json');
+        req.setRequestHeader('accept', 'application/json');
 
-        if (token !== undefined && token !== null) {
-            req.setRequestHeader('X-Token', token);
-        } else {
-            req.setRequestHeader('X-Token', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE1Mjc1MzIyMjUsImV4cCI6MTUyNzUzNTgyNSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pblVzZXIiLCJpc0FkbWluIjp0cnVlLCJpc01hZXN0cm8iOnRydWV9.HPWvDk9JuCvLPUBg_msEIDz1e7sg-WCP3Eeh83cfEElRf8tg3o_VglSxM1cgtl-IQq3jNu6NpFq9d8kaFl2Jkg');
+        if (token === undefined || token === null) {
+            token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE1MjgwMjIxNDgsImV4cCI6MTUyODAyNTc0OCwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pblVzZXIiLCJpc0FkbWluIjp0cnVlLCJpc01hZXN0cm8iOnRydWV9.btaYWwgZfifYfE7Q69CLPKE_r6DQU2gW6Vqso4f1Q5Sn7sOUNPDtxR6PhlwF1o8LH1oO_HnVrrub6_rHuu1H-A';
         }
+
+        req.setRequestHeader('X-Token', token);
+
+        localStorage.setItem('X-Token', token);
 
         req.addEventListener("load", function () {
             if (req.status >= 200 && req.status < 400) {
@@ -41,6 +33,11 @@ function requestApi(requestMethod, route, body, token) {
             reject(req);
         });
 
-        req.send(body);
+        if (body !== null && body !== undefined) {
+            req.send(body);
+        } else {
+            req.send();
+        }
+
     });
 }

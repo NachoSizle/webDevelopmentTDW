@@ -35,6 +35,9 @@ function loadProfile() {
 
         var solutionsReview = localStorage.getItem('solutionsToReview');
         this.solutionsToReview = JSON.parse(solutionsReview);
+
+        var questionsMaster = localStorage.getItem('questionsMaster');
+        this.questions = JSON.parse(questionsMaster);
         setDataToPage();
     }
 }
@@ -48,40 +51,118 @@ function supportsHTML5Storage() {
 }
 
 function setDataToPage() {
-    $('#hiMaster')[0].innerText = "Hola " + this.userLogged["name"];
+    $('#hiMaster')[0].innerText = "Hola " + this.userLogged["username"];
 
     getQuestions();
 }
 
 function getQuestions() {
     $('#containerQuestions').empty();
-    var questions = localStorage.getItem('questionsMaster');
-    this.questions = JSON.parse(questions);
+    console.log('Get questions');
+
+    //LLAMAR A LA API PARA QUE NOS TRAIGA TODAS LAS CUESTIONES
+    //QUE ESTAN EN LA BASE DE DATOS PARA EL MAESTRO QUE HA HECHO LOGIN
+    /*
+    var questions = this.userLogged.cuestiones;
+    if (questions.length > 0) {
+        this.getQuestionsFromApi().then((res) => {
+            console.log(res);
+            this.questions = res;
+            this.numQuestions = this.questions.length;
+
+            this.questions.forEach(question => {
+                var checked = question.enum_disponible ? 'checked' : '';
+                var textChecked = question.enum_disponible ? 'Available' : 'Not available';
+                var hasSolutionToReview = getSolutionProposedToQuestion(question.idCuestion) ? '' : 'hidden';
+                var blockQuestion = "<div class='col s12 m6 hoverable' id='" + question.enum_descripcion + "'>" +
+                    "<div class='card blue-grey darken-1'>" +
+                    "<div class='card-content white-text noPadBottom'>" +
+                    "<span class='card-title'>" + question.enum_descripcion + "</span>" +
+                    "<label>" +
+                    "<input type='checkbox'" + checked + " disabled/>" +
+                    "<span>" + textChecked + "</span>" +
+                    "</label>" +
+                    "</div>" +
+                    "<div class='card-action col s12 m12'>" +
+                    "<a href='#' onclick='viewThisQuestion(" + question.idCuestion + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View</a>" +
+                    "<a href='#remModal' onclick='setQuestion(" + question.idCuestion + ")' class='modal-trigger linkBtnCard'><i class='material-icons iconBtnCard'>delete_forever</i>Remove</a>" +
+                    "<a href='#' onclick='viewAnswerFromStudents(" + question.idCuestion + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View Answers</a>" +
+                    "<a href='#' " + hasSolutionToReview + " onclick='reviewAnswerFromStudents(" + question.idCuestion + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>sim_card_alert</i>Review answers</a>" +
+                    "</div>" +
+                    "</div>" +
+                    "</div>";
+                $('#containerQuestions').append(blockQuestion);
+            });
+        }).catch((err) => {
+            console.log(err);
+        });
+        */
+
+
     this.numQuestions = this.questions.length;
 
     this.questions.forEach(question => {
         var checked = question.available ? 'checked' : '';
         var textChecked = question.available ? 'Available' : 'Not available';
         var hasSolutionToReview = getSolutionProposedToQuestion(question.id) ? '' : 'hidden';
-        var blockQuestion = "<div class='col s12 m6 hoverable' id='" + question["title"] + "'>" +
+        var blockQuestion = "<div class='col s12 m6 hoverable' id='" + question.title + "'>" +
             "<div class='card blue-grey darken-1'>" +
             "<div class='card-content white-text noPadBottom'>" +
-            "<span class='card-title'>" + question["title"] + "</span>" +
+            "<span class='card-title'>" + question.title + "</span>" +
             "<label>" +
             "<input type='checkbox'" + checked + " disabled/>" +
             "<span>" + textChecked + "</span>" +
             "</label>" +
             "</div>" +
             "<div class='card-action col s12 m12'>" +
-            "<a href='#' onclick='viewThisQuestion(" + question["id"] + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View</a>" +
-            "<a href='#remModal' onclick='setQuestion(" + question["id"] + ")' class='modal-trigger linkBtnCard'><i class='material-icons iconBtnCard'>delete_forever</i>Remove</a>" +
-            "<a href='#' onclick='viewAnswerFromStudents(" + question["id"] + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View Answers</a>" +
-            "<a href='#' " + hasSolutionToReview + " onclick='reviewAnswerFromStudents(" + question["id"] + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>sim_card_alert</i>Review answers</a>" +
+            "<a href='#' onclick='viewThisQuestion(" + question.id + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View</a>" +
+            "<a href='#remModal' onclick='setQuestion(" + question.id + ")' class='modal-trigger linkBtnCard'><i class='material-icons iconBtnCard'>delete_forever</i>Remove</a>" +
+            "<a href='#' onclick='viewAnswerFromStudents(" + question.id + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View Answers</a>" +
+            "<a href='#' " + hasSolutionToReview + " onclick='reviewAnswerFromStudents(" + question.id + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>sim_card_alert</i>Review answers</a>" +
             "</div>" +
             "</div>" +
             "</div>";
         $('#containerQuestions').append(blockQuestion);
     });
+}
+
+function getQuestionsFromApi() {
+    var questions = this.userLogged.cuestiones;
+    var questionsArrayPromise = [];
+
+    return new Promise((resolve, reject) => {
+        questions.forEach((questionId) => {
+            var promise = new Promise((resolve, reject) => {
+                this.requestApi('GET', 'questions/' + questionId, null).then((response) => {
+                    console.log(response);
+                    if (response !== null && response !== undefined) {
+                        var resParsered = JSON.parse(response);
+                        var resGoodData = this.parseCuestion(resParsered);
+                        resolve(resGoodData);
+                    }
+                }).catch((err) => {
+                    console.log(err);
+                    reject(err);
+                });
+            });
+            questionsArrayPromise.push(promise);
+        });
+
+        Promise.all(questionsArrayPromise).then((values) => {
+            console.log(values);
+            resolve(values);
+        }).catch((err) => {
+            console.log(err);
+            reject(err);
+        });
+    });
+}
+
+function parseCuestion(questionData) {
+    if (questionData !== null && questionData !== undefined) {
+        questionData.cuestion.creador = this.userLogged.id;
+    }
+    return questionData;
 }
 
 function getSolutionProposedToQuestion(idQuestion) {
@@ -94,6 +175,10 @@ function getSolutionProposedToQuestion(idQuestion) {
         });
     }
     return hasSolutionToReview;
+}
+
+function closeInfoModal() {
+    $('#infoNoQuestionsModal').closeModal();
 }
 
 function reviewAnswerFromStudents(questionId) {

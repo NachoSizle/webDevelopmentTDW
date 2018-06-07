@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="./../css/materialize.css" media="screen,projection">
+    <link rel="stylesheet" href="./../css/signUpProcess.css">
+    <title>Sign Up!</title>
+</head>
+
+<body>
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#!" class="brand-logo">Sign Up!</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card card-container">
+            <p class="profile-name-card">Complete your data</p>
+            <form class="form-signin" onsubmit="validateData()">
+                <span id="reauth-email" class="reauth-email"></span>
+                <input type="email" id="inputEmail" class="form-control" placeholder="Email.." required autofocus>
+
+                <div class="row inputCheckboxes">
+                    <div class="col s4">
+                        <label>
+                            <input type="checkbox" id="chkMaster" />
+                            <span>Is Master?</span>
+                        </label>
+                    </div>
+                    <div class="col s4">
+                        <label>
+                            <input type="checkbox" id="chkAdmin" />
+                            <span>Is Admin?</span>
+                        </label>
+                    </div>
+                    <div class="col s4">
+                        <label>
+                            <input type="checkbox" id="chkEnabled" />
+                            <span>Is Enabled?</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="center-align">
+                    <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Start</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="./../js/materialize.js"></script>
+    <script src="./../js/signUpProcess.js"></script>
+    <script src="./../js/api.js"></script>
+</body>
+
+</html>

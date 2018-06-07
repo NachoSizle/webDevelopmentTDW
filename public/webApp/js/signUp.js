@@ -37,10 +37,6 @@ function validateUser() {
     signUpUser();
 }
 
-function goToSignUpPage() {
-    window.location.href = "./html/signUp.html";
-}
-
 function signUpUser() {
 
     var userInput = $("#inputUser").val();
@@ -48,30 +44,28 @@ function signUpUser() {
 
     var userData = {
         'username': $("#inputUser").val(),
-        'password': $("#inputPassword").val()
+        'password': $("#inputPassword").val(),
+        'email': ''
     };
 
     var userDataJSON = JSON.stringify(userData);
 
     this.requestApi('POST', 'users', userDataJSON).then((response) => {
         console.log(response);
-        /*
-        if (response) {
-            this.userSelected = response['User'];
-            localStorage.setItem('userLogged', this.userSelected);
-            localStorage.setItem('X-Token', response['X-Token']);
+        if (response !== null && response !== undefined) {
+            var resParsered = JSON.parse(response);
+            this.userSelected = resParsered['usuario'];
+            localStorage.setItem('userLogged', JSON.stringify(this.userSelected));
             resolveTo();
         }
-        */
     }).catch((err) => {
+        if (err.status === 400) {
+            //Mostrar modal
+        }
         console.log(err);
     });
 }
 
 function resolveTo() {
-    if (this.userSelected["role"] === "master") {
-        window.location.href = "./html/masterMainPage.html";
-    } else {
-        window.location.href = "./html/studentMainPage.html";
-    }
+    window.location.href = "./signUpProcess.html";
 }
