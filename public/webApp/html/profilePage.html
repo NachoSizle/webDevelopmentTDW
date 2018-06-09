@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="./../css/materialize.css" media="screen,projection">
+    <link rel="stylesheet" href="./../css/profilePage.css">
+    <title>Your profile</title>
+</head>
+
+<body>
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#!" class="brand-logo">Your profile</a>
+            <a href="#" data-target="mobile-demo" class="sidenav-trigger">
+                <i class="material-icons">menu</i>
+            </a>
+            <ul class="right hide-on-med-and-down">
+                <li>
+                    <a class="nav-link" href="./masterMainPage.html">Master Page</a>
+                </li>
+                <li>
+                    <a class="nav-link" href="./profilePage.html">Your profile</a>
+                </li>
+                <li>
+                    <a class="nav-link" href="./../index.html" onclick="logout()">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <ul class="sidenav" id="mobile-demo">
+        <li>
+            <a class="nav-link" href="./masterMainPage.html">Master Page</a>
+        </li>
+        <li>
+            <a class="nav-link" href="./profilePage.html">Your profile</a>
+        </li>
+        <li>
+            <a class="nav-link" href="./../index.html" onclick="logout()">Logout</a>
+        </li>
+    </ul>
+
+    <div class="container row mainContainer">
+        <div class="col s2 m2">
+            <div class="card horizontal">
+                <div class="card-stacked">
+                    <div class="card-action profileOption center-align" onclick="selectThisOption(this)">
+                        <a href="#">
+                            <i class="small material-icons">account_circle</i>
+                            <span class="titleLink">About</span>
+                        </a>
+                    </div>
+                    <div class="card-action profileOption center-align" onclick="selectThisOption(this)">
+                        <a href="#">
+                            <i class="small material-icons">insert_chart</i>
+                            <span class="titleLink">Resume</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col s10 m10">
+            <div class="card large">
+                <div class="card-image">
+                    <img class="imgBackground" src="./../assets/bg.jpg">
+                </div>
+                <div class="col s12 m12 valign-wrapper contentProfileHeader">
+                    <div class="col s2 m2 contentCard center-align valign-wrapper">
+                        <img class="profileImg circle responsive-image" src="./../assets/charmander.png">
+                    </div>
+                    <div class="col s8 m8 contentUser">
+                        <h3 class="left-align" id="userName"></h3>
+                        <h5 class="left-align" id="userEmail"></h5>
+                    </div>
+                    <div class="col s1 m1 editProfile">
+                        <a href="#!" class="secondary-content" onclick="goToEditProfile()">
+                            <i class="material-icons">create</i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col s11 m11 valign-wrapper contentProfileCharacteristics">
+                    <div class="col s4 m4 personalCharacteristics">
+                        <ul class="collection">
+                            <li class="collection-item itemChar">
+                                <div>Is Master
+                                    <a href="#!" class="secondary-content" id="iconMaster">
+                                        <i class="material-icons">check</i>
+                                    </a>
+                                </div>
+                            </li>
+                            <li class="collection-item itemChar">
+                                <div>Is Admin
+                                    <a href="#!" class="secondary-content" id="iconAdmin">
+                                        <i class="material-icons">check</i>
+                                    </a>
+                                </div>
+                            </li>
+                            <li class="collection-item itemChar lastItemChar">
+                                <div>Is Enable
+                                    <a href="#!" class="secondary-content" id="iconEnable">
+                                        <i class="material-icons">clear</i>
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="./../js/materialize.js"></script>
+    <script src="./../js/api.js"></script>
+    <script src="./../js/profilePage.js"></script>
+</body>
+
+</html>

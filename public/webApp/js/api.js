@@ -14,7 +14,7 @@ function requestApi(requestMethod, route, body, token) {
         req.setRequestHeader('accept', 'application/json');
 
         if (token === undefined || token === null) {
-            token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE1MjgwMjIxNDgsImV4cCI6MTUyODAyNTc0OCwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pblVzZXIiLCJpc0FkbWluIjp0cnVlLCJpc01hZXN0cm8iOnRydWV9.btaYWwgZfifYfE7Q69CLPKE_r6DQU2gW6Vqso4f1Q5Sn7sOUNPDtxR6PhlwF1o8LH1oO_HnVrrub6_rHuu1H-A';
+            token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE1MjgzOTE4MzksImV4cCI6MTUyODM5NTQzOSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pblVzZXIiLCJpc0FkbWluIjp0cnVlLCJpc01hZXN0cm8iOnRydWV9.t8cexPCTqFDOrkyqYQKhjobxSDNkzajDcAyEXwXXKTE0p4WDUYxIkRRz2rTB57z7ZACOl84j5IxvXQku-FkNnw';
         }
 
         req.setRequestHeader('X-Token', token);

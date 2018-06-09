@@ -1,0 +1,12 @@
+.mainContainer {
+    margin-top: 20px;
+}
+
+.card.large {
+    height: 400px !important;
+    padding-top: 20px;
+}
+
+.btn-signin {
+    margin-left: 45%;
+}

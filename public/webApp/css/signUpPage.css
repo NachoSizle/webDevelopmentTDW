@@ -162,3 +162,9 @@ html {
 .forgot-password:focus {
     color: rgb(12, 97, 33);
 }
+
+.paragraphOr {
+    text-align: center;
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray
+}

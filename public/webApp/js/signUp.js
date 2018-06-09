@@ -66,6 +66,10 @@ function signUpUser() {
     });
 }
 
+function goToSignInPage() {
+    window.location.href = "../index.html";
+}
+
 function resolveTo() {
     window.location.href = "./signUpProcess.html";
 }

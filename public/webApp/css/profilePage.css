@@ -1,0 +1,106 @@
+.mainContainer {
+    margin-top: 20px;
+}
+
+.profileOption {
+    height: 85px !important;
+}
+
+i.small.material-icons {
+    color: #ee6e73;
+}
+
+.titleLink {
+    color: #000;
+    text-transform: capitalize;
+}
+
+.contentCard {
+    padding-top: 30px;
+}
+
+.card-image {
+    max-height: 50% !important;
+}
+
+.imgBackground {
+    height: 250px !important;
+}
+
+.profileImg {
+    background-color: #fff;
+    border: 1.5px solid #ee6e73;
+    padding: 0px 10px;
+    width: 140px;
+}
+
+.contentUser {
+    background-color: #fff;
+    border: 1.5px solid #ee6e73;
+    border-left: 0;
+    padding-left: 50px;
+    position: relative;
+    margin-left: 38px !important;
+    padding: 10px 0px !important;
+    padding-left: 35px !important;
+    border-radius: 0px 10px 10px 0px;
+}
+
+.contentUser>h3 {
+    margin: 0;
+}
+
+.contentUser>h5 {
+    margin: 0;
+    color: #ee6e73;
+}
+
+.contentProfileHeader {
+    position: relative;
+    top: -70px;
+}
+
+.contentCard {
+    margin-left: 0px !important;
+}
+
+.contentProfileCharacteristics {
+    position: relative;
+    top: -55px;
+    padding-left: 25px !important;
+}
+
+.personalCharacteristics {
+    margin-left: 0px !important;
+    padding-left: 0px !important;
+}
+
+.itemChar {
+    border: 1.5px solid #ee6e73 !important;
+    border-bottom: none !important;
+}
+
+.secondary-content {
+    color: #ee6e73;
+}
+
+.isActive {
+    color: #81c784 !important;
+}
+
+.isNotActive {
+    color: #ee6e73 !important;
+}
+
+.lastItemChar {
+    border-bottom: 1.5px solid #ee6e73 !important;
+}
+
+.editProfile {
+    position: relative;
+    top: 25px;
+}
+
+.selected {
+    background-color: #eeeeee !important;
+}
