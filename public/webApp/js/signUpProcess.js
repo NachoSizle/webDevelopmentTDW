@@ -50,8 +50,9 @@ function updateData() {
     };
 
     var userDataJSON = JSON.stringify(userData);
+    var token = localStorage.getItem('X-Token');
 
-    this.requestApi('PUT', 'users/' + this.userDataSignUp.id, userDataJSON).then((response) => {
+    this.requestApi('PUT', 'users/' + this.userDataSignUp.id, userDataJSON, token).then((response) => {
         console.log(response);
         if (response !== null && response !== undefined) {
             var resParsered = JSON.parse(response);

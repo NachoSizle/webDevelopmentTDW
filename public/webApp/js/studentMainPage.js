@@ -2,8 +2,9 @@ window.onload = function () {
     init();
 };
 
+var saveToken = null;
 var answersSolutionStudent = [];
-var studentAnsweredAllQuestions = false;
+var questionsWithoutAnswer = [];
 
 function init() {
     initElements();
@@ -29,6 +30,7 @@ function loadProfile() {
     if (supportsHTML5Storage()) {
         var user = localStorage.getItem('userLogged');
         this.userLogged = JSON.parse(user);
+        this.saveToken = localStorage.getItem('X-Token');
         setDataToPage();
     }
 }
@@ -41,86 +43,139 @@ function supportsHTML5Storage() {
     }
 }
 
+function getAllQuestions() {
+    var questionsToProcess = [];
+    return new Promise((resolve, reject) => {
+        this.requestApi('GET', 'questions', null, this.saveToken).then((response) => {
+            if (response !== null && response !== undefined) {
+                var resParsered = JSON.parse(response);
+                var questionsParsered = resParsered.cuestions;
+                if (questionsParsered.length > 0) {
+                    questionsParsered.map((question) => {
+                        var q = question.cuestion;
+                        if (q.enum_disponible) {
+                            questionsToProcess.push(q);
+                        }
+                    });
+                }
+                resolve(questionsToProcess);
+            }
+        }).catch((err) => {
+            console.log(err);
+            reject(err);
+        });
+    });
+}
+
 function setDataToPage() {
     $('#hiMaster')[0].innerText = "Hola " + this.userLogged["username"];
     getQuestions();
 }
 
+function getQuestionsAnsweredByUser() {
+    var questionsAnswered = [];
+    return new Promise((resolve, reject) => {
+        this.requestApi('GET', 'solutions', null, this.saveToken).then((response) => {
+            if (response !== null && response !== undefined) {
+                var resParsered = JSON.parse(response);
+                var solutionsParsered = resParsered.soluciones;
+                if (solutionsParsered.length > 0) {
+                    solutionsParsered.map((solution) => {
+                        var sol = solution.answer;
+                        if (sol.student === this.userLogged.username) {
+                            questionsAnswered.push(sol);
+                        }
+                    });
+                }
+                resolve(questionsAnswered);
+            }
+        }).catch((err) => {
+            console.log(err);
+            reject(err);
+        });
+    });
+}
+
 function getQuestions() {
     $('#containerQuestions').empty();
 
-    var questions = localStorage.getItem('questionsMaster');
-    this.questions = JSON.parse(questions);
+    // TODAS LAS CUESTIONES QUE ESTAN EN BBDD Y QUE ESTAN DISPONIBLES
+    this.getAllQuestions().then((res) => {
+        console.log(res);
+        if (res !== null && res !== undefined) {
+            this.questionsAvailable = res;
+            this.numQuestions = this.questionsAvailable.length;
+            // TODAS LAS CUESTIONES QUE EL USUARIO HA RESPONDIDO
+            this.getQuestionsAnsweredByUser().then((questionsAnswered) => {
+                console.log(questionsAnswered);
+                if (questionsAnswered !== null && questionsAnswered !== undefined) {
+                    this.answersSolutionStudent = questionsAnswered;
+                }
 
-    var answersSolutions = localStorage.getItem('answersSolutionStudent');
-    this.answersSolutionStudent = JSON.parse(answersSolutions);
+                // HAY QUE SACAR LAS CUESTIONES QUE EL USUARIO NO HA RESPONDIDO
+                if (this.answersSolutionStudent.length > 0) {
+                    this.answersSolutionStudent.map((answer) => {
+                        var idQuestion = answer.idQuestion;
+                        this.questionsAvailable.map((question) => {
+                            if (question.idQuestion !== idQuestion) {
+                                this,
+                                questionsWithoutAnswer.push(question);
+                            }
+                        })
+                    });
+                } else {
+                    this.questionsWithoutAnswer = this.questionsAvailable;
+                }
 
-    this.numQuestions = this.questions.length;
+                this.makeStructToQuestionsWithAnswer();
+                this.makeStructToQuestionsWithoutAnswer();
 
-    var questionsAnswered = this.answersSolutionStudent.filter(function (answerSol) {
-        return this.userLogged.name === answerSol.student;
-    });
-
-    var questionsWithAnswer = [];
-
-    this.questions.map(function (question) {
-        questionsAnswered.map(function (questionAnsweredStudent) {
-            var idQuestionsAns = questionAnsweredStudent.idQuestion;
-
-            if (question.id === idQuestionsAns) {
-                questionsWithAnswer.push(question);
-            }
-        });
-    });
-
-    var idQuestionsAnswered = [];
-    questionsAnswered.forEach(qAns => {
-        idQuestionsAnswered.push(qAns.idQuestion);
-    });
-
-    var questionsWithoutAnswer = this.questions.filter(function (question) {
-        return !idQuestionsAnswered.includes(question.id);
-    });
-
-    questionsWithAnswer.forEach(question => {
-        var isAvailable = question.available;
-        if (isAvailable) {
-            var checked = isAvailable ? 'checked' : '';
-            var textChecked = isAvailable ? 'Available' : 'Not available';
-            var blockQuestion = "<div class='col s12 m12 hoverable' id='" + question["title"] + "'>" +
-                "<div class='card blue-grey darken-1'>" +
-                "<div class='card-content white-text'>" +
-                "<span class='card-title'>" + question["title"] + "</span>" +
-                "</div>" +
-                "</div>" +
-                "</div>";
-            $('#containerQuestionsAnswered').append(blockQuestion);
+                var textQuestionsAnswered = this.answersSolutionStudent.length === 0 ? 'You have not answered any questions yet' : 'Questions answered!';
+                var textQuestionsAvailable = this.questionsWithoutAnswer.length === 0 ? 'Congratulations! You have answered all the questions.' : 'Questions available!';
+                $('#headerAvailableQuestions').text(textQuestionsAvailable);
+                $('#headerAnsweredQuestions').text(textQuestionsAnswered);
+            });
         }
     });
+}
 
-    questionsWithoutAnswer.forEach(question => {
-        var isAvailable = question.available;
+function makeStructToQuestionsWithoutAnswer() {
+    this.questionsWithoutAnswer.forEach(question => {
+        var isAvailable = question.enum_disponible;
         if (isAvailable) {
             var checked = isAvailable ? 'checked' : '';
             var textChecked = isAvailable ? 'Available' : 'Not available';
-            var blockQuestion = "<div class='col s12 m6 hoverable' id='" + question["title"] + "'>" +
+            var blockQuestion = "<div class='col s12 m6 hoverable' id='" + question.enum_descripcion + "'>" +
                 "<div class='card blue-grey darken-1'>" +
                 "<div class='card-content white-text'>" +
-                "<span class='card-title'>" + question["title"] + "</span>" +
+                "<span class='card-title'>" + question.enum_descripcion + "</span>" +
                 "</div>" +
                 "<div class='card-action'>" +
-                "<a href='#' onclick='viewThisQuestion(" + question["id"] + ")'><i class='material-icons alignToText'>visibility</i> Answer!</a>" +
+                "<a href='#' onclick='viewThisQuestion(" + question.idCuestion + ")'><i class='material-icons alignToText'>visibility</i> Answer!</a>" +
                 "</div>" +
                 "</div>" +
                 "</div>";
             $('#containerQuestions').append(blockQuestion);
         }
     });
+}
 
-    var textQuestionsAnswered = questionsWithAnswer.length === 0 ? 'You have not answered any questions yet' : 'Questions answered!';
-    var textQuestionsAvailable = questionsWithoutAnswer.length === 0 ? 'Congratulations! You have answered all the questions.' : 'Questions available!';
-    $('#headerAvailableQuestions').text(textQuestionsAvailable);
-    $('#headerAnsweredQuestions').text(textQuestionsAnswered);
+function makeStructToQuestionsWithAnswer() {
+    this.answersSolutionStudent.forEach(question => {
+        var isAvailable = question.enum_disponible;
+        if (isAvailable) {
+            var checked = isAvailable ? 'checked' : '';
+            var textChecked = isAvailable ? 'Available' : 'Not available';
+            var blockQuestion = "<div class='col s12 m12 hoverable' id='" + question.enum_descripcion + "'>" +
+                "<div class='card blue-grey darken-1'>" +
+                "<div class='card-content white-text'>" +
+                "<span class='card-title'>" + question.enum_descripcion + "</span>" +
+                "</div>" +
+                "</div>" +
+                "</div>";
+            $('#containerQuestionsAnswered').append(blockQuestion);
+        }
+    });
 }
 
 function viewThisQuestion(questionId) {
@@ -129,8 +184,8 @@ function viewThisQuestion(questionId) {
 }
 
 function setSelectedQuestion(questionId) {
-    this.questions.map(function (question) {
-        if (question.id === questionId) {
+    this.questionsAvailable.map(function (question) {
+        if (question.idCuestion === questionId) {
             this.questionSelected = question;
         }
     });

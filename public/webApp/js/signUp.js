@@ -14,6 +14,7 @@ function init() {
 function initElements() {
     $(document).ready(function () {
         $('.sidenav').sidenav();
+        $('.modal').modal();
     });
 }
 
@@ -50,19 +51,23 @@ function signUpUser() {
 
     var userDataJSON = JSON.stringify(userData);
 
-    this.requestApi('POST', 'users', userDataJSON).then((response) => {
-        console.log(response);
-        if (response !== null && response !== undefined) {
-            var resParsered = JSON.parse(response);
-            this.userSelected = resParsered['usuario'];
-            localStorage.setItem('userLogged', JSON.stringify(this.userSelected));
-            resolveTo();
-        }
-    }).catch((err) => {
-        if (err.status === 400) {
-            //Mostrar modal
-        }
-        console.log(err);
+    this.signInAdminUser().then((res) => {
+        this.requestApi('POST', 'users', userDataJSON, res).then((response) => {
+            console.log(response);
+            if (response !== null && response !== undefined) {
+                var resParsered = JSON.parse(response);
+                this.userSelected = resParsered['usuario'];
+                localStorage.setItem('userLogged', JSON.stringify(this.userSelected));
+                resolveTo();
+            }
+        }).catch((err) => {
+            if (err.status === 400) {
+                //Mostrar modal
+                $('#modalText').text(err.statusText);
+                $('#modal-warning').modal('open');
+            }
+            console.log(err);
+        });
     });
 }
 

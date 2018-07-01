@@ -6,6 +6,39 @@ var pathApi = "http://localhost:8080/api/v1/";
 
 function init() {}
 
+function signInAdminUser() {
+    return new Promise((resolve, reject) => {
+        var bodyLogin = {
+            username: 'adminUser',
+            password: '*adminUser*'
+        };
+        var bodyParsered = JSON.stringify(bodyLogin);
+        var reqLogin = new XMLHttpRequest();
+
+        reqLogin.open('POST', 'http://localhost:8080/api/v1/login', true);
+        reqLogin.setRequestHeader('content-type', 'application/json');
+
+        reqLogin.addEventListener("load", function () {
+            if (reqLogin.status >= 200 && reqLogin.status < 400) {
+                var token = JSON.parse(reqLogin.responseText)['X-Token'];
+                localStorage.setItem('X-Token', token);
+                resolve(token);
+            } else {
+                console.error(reqLogin.status + " " + reqLogin.statusText);
+            }
+        });
+        reqLogin.addEventListener("error", function () {
+            console.log(reqLogin);
+        });
+
+        if (bodyParsered !== null && bodyParsered !== undefined) {
+            reqLogin.send(bodyParsered);
+        } else {
+            reqLogin.send();
+        }
+    });
+}
+
 function requestApi(requestMethod, route, body, token) {
     return new Promise((resolve, reject) => {
         var req = new XMLHttpRequest();
@@ -13,13 +46,7 @@ function requestApi(requestMethod, route, body, token) {
         req.open(requestMethod, this.pathApi + route, true);
         req.setRequestHeader('accept', 'application/json');
 
-        if (token === undefined || token === null) {
-            token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE1MjgzOTE4MzksImV4cCI6MTUyODM5NTQzOSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pblVzZXIiLCJpc0FkbWluIjp0cnVlLCJpc01hZXN0cm8iOnRydWV9.t8cexPCTqFDOrkyqYQKhjobxSDNkzajDcAyEXwXXKTE0p4WDUYxIkRRz2rTB57z7ZACOl84j5IxvXQku-FkNnw';
-        }
-
         req.setRequestHeader('X-Token', token);
-
-        localStorage.setItem('X-Token', token);
 
         req.addEventListener("load", function () {
             if (req.status >= 200 && req.status < 400) {

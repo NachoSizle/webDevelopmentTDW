@@ -20,6 +20,11 @@ function loadProfile() {
     if (supportsHTML5Storage()) {
         var user = localStorage.getItem('userLogged');
         this.userLogged = JSON.parse(user);
+        if (this.userLogged.maestro) {
+            $('.linkStudentPage').hide();
+        } else {
+            $('.linkMasterPage').hide();
+        }
         setInitData();
     }
 }

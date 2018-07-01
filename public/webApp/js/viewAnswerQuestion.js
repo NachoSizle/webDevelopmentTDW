@@ -17,7 +17,6 @@ var numSolutionsToReview = 0;
 function init() {
     initElements();
     loadInitValues();
-    setDataToPage();
 }
 
 function initElements() {
@@ -38,6 +37,8 @@ function loadProfile() {
         var user = localStorage.getItem('userLogged');
         this.userLogged = JSON.parse(user);
 
+        this.saveToken = localStorage.getItem('X-Token');
+
         var question = localStorage.getItem('questionSelected');
         this.questionSelected = JSON.parse(question);
 
@@ -48,17 +49,72 @@ function loadProfile() {
         this.solutionsToReview = JSON.parse(solutionsReview);
         this.numSolutionsToReview = this.solutionsToReview.length;
 
-        this.incorrectSolutions = this.questionSelected.solutions;
-        this.totalNumRationings = calcTotalNumRationings();
+        // SACAMOS LAS SOLUCIONES DADAS A ESTA CUESTION
+        this.getAllAnswersToThisQuestion().then((res) => {
+            if (res !== null && res !== undefined) {
+                this.incorrectSolutions = res;
+                this.numSolutions = res.length;
+                this.calcTotalNumRationings().then((rationings) => {
+                    this.allRationingsToThisQuestions = rationings;
+                    this.totalNumRationings = rationings.length;
+                    this.setDataToPage();
+                });
+            }
+        });
+
     }
+}
+
+function getAllAnswersToThisQuestion() {
+    var questionsAnswered = [];
+    return new Promise((resolve, reject) => {
+        this.requestApi('GET', 'solutions', null, this.saveToken).then((response) => {
+            if (response !== null && response !== undefined) {
+                var resParsered = JSON.parse(response);
+                var solutionsParsered = resParsered.soluciones;
+                if (solutionsParsered.length > 0) {
+                    solutionsParsered.map((solution) => {
+                        var sol = solution.answer;
+                        if (sol.idQuestion === this.questionSelected.idCuestion) {
+                            questionsAnswered.push(sol);
+                        }
+                    });
+                }
+                resolve(questionsAnswered);
+            }
+        }).catch((err) => {
+            console.log(err);
+            reject(err);
+        });
+    });
 }
 
 function calcTotalNumRationings() {
     var numRationings = 0;
-    this.incorrectSolutions.forEach(incorrectSolutions => {
-        numRationings += incorrectSolutions.rationings.length;
+    var rationingFromThisAnswer = [];
+
+    return new Promise((resolve, reject) => {
+        this.requestApi('GET', 'rationings', null, this.saveToken).then((response) => {
+            if (response !== null && response !== undefined) {
+                var resParsered = JSON.parse(response);
+                var rationingsParsered = resParsered.razonamientos;
+                if (rationingsParsered.length > 0) {
+                    this.incorrectSolutions.map((sol) => {
+                        rationingsParsered.map((rationing) => {
+                            var rat = rationing.rationing;
+                            if (sol.idAnswer === rat.idSolution) {
+                                rationingFromThisAnswer.push(rat);
+                            }
+                        });
+                    });
+                }
+                resolve(rationingFromThisAnswer);
+            }
+        }).catch((err) => {
+            console.log(err);
+            reject(err);
+        });
     });
-    return numRationings;
 }
 
 function supportsHTML5Storage() {
@@ -70,10 +126,8 @@ function supportsHTML5Storage() {
 }
 
 function setDataToPage() {
-    $('#titleQuestionCard').text(this.questionSelected.title);
-    $('#questionTitleAddSolution').text(this.questionSelected.title);
-
-    this.numSolutions = this.questionSelected.solutions.length;
+    $('#titleQuestionCard').text(this.questionSelected.enum_descripcion);
+    $('#questionTitleAddSolution').text(this.questionSelected.enum_descripcion);
 }
 
 function addSolution() {
@@ -91,21 +145,21 @@ function addSolution() {
 
 function checkIfQuestionHasFollowingSolutions() {
     if (this.incorrectSolutions.length > 0) {
-        this.incorrectSolutions.map(function (actualSolution) {
-            var incorrectSolutionObj = "<div class='card horizontal' id='cardActualSolution" + actualSolution.id + "'>" +
+        this.incorrectSolutions.map(function (actualSolution, index) {
+            var incorrectSolutionObj = "<div class='card horizontal' id='cardActualSolution" + index + "'>" +
                 "<div class='card-stacked'>" +
                 "<div class='card-content pad10'>" +
                 "<span class='right'>" +
-                "<i class='material-icons' id='resValidateAnswer" + actualSolution.id + "'></i>" +
+                "<i class='material-icons' id='resValidateAnswer" + index + "'></i>" +
                 "</span>" +
-                "<p>" + actualSolution.title + "</p>" +
+                "<p>" + actualSolution.proposedSolution + "</p>" +
                 "</div>" +
-                "<div class='card-action' id='actionFollowingSolution" + actualSolution.id + "'>" +
+                "<div class='card-action' id='actionFollowingSolution" + index + "'>" +
                 "<label>" +
-                "<input id='itsNotCorrectAnswer" + actualSolution.id + "' type='checkbox'/>" +
+                "<input id='itsNotCorrectAnswer" + index + "' type='checkbox'/>" +
                 "<span>It's correct</span>" +
                 "</label>" +
-                "<a href='#' onclick='validateAnswer(" + actualSolution.id + ")' class='right'>Validate!</a>" +
+                "<a href='#' onclick='validateAnswer(" + index + ")' class='right'>Validate!</a>" +
                 "</div>" +
                 "</div>" +
                 "</div>";
@@ -134,6 +188,7 @@ function validateAnswer(idSolution) {
         }
         $('#resValidateAnswer' + idSolution).addClass('incorrectAnswer');
     }
+    // TO-DO: SAVE ANSWER
     var proposeSolutionStudentAnswer = {
         "answer": itsCorrect,
         "followingSolution": this.incorrectSolutions[idSolution],
@@ -169,6 +224,7 @@ function saveProposeRationing(idSolution) {
     $('#textHeaderProposeRationing' + idSolution).text('Your proposed rationing: ');
     $('#textProposeRationing' + idSolution).text(proposedRationing);
 
+    // TO-DO: SAVE RATIONING
     var proposedRationingAnswer = {
         "proposedRationing": proposedRationing,
         "idSolution": idSolution,
@@ -192,22 +248,24 @@ function addProposeRationingToAnswer(proposedRationingAnswer) {
 
 function showAllIncorrectSolutions(idSolution) {
     this.numProposeRationingsAnswered++;
-    if (this.incorrectSolutions[idSolution].rationings.length > 0) {
-        this.incorrectSolutions[idSolution].rationings.map(function (rationing) {
-            var incorrectSolutionObj = "<div class='card horizontal checkRationing' id='cardActualRationing" + rationing.id + "'>" +
+
+    //MOSTRAR TODOS LOS RAZONAMIENTOS QUE SE HAN DADO A ESTA PREGUNTA
+    if (this.allRationingsToThisQuestions.length > 0) {
+        this.allRationingsToThisQuestions.map(function (rationing, index) {
+            var incorrectSolutionObj = "<div class='card horizontal checkRationing' id='cardActualRationing" + index + "'>" +
                 "<div class='card-stacked'>" +
                 "<div class='card-content pad10'>" +
                 "<span class='right'>" +
-                "<i class='material-icons' id='resValidateAnswerRationing" + rationing.id + "'></i>" +
+                "<i class='material-icons' id='resValidateAnswerRationing" + index + "'></i>" +
                 "</span>" +
                 "<p>" + rationing.title + "</p>" +
                 "</div>" +
-                "<div class='card-action' id='actionRationingSolution" + rationing.id + "'>" +
+                "<div class='card-action' id='actionRationingSolution" + index + "'>" +
                 "<label>" +
-                "<input id='itsNotCorrectAnswerProposedRationings" + rationing.id + "' type='checkbox'/>" +
+                "<input id='itsNotCorrectAnswerProposedRationings" + index + "' type='checkbox'/>" +
                 "<span>It's justify</span>" +
                 "</label>" +
-                "<a href='#' onclick='validateRationing(" + rationing.id + ", " + idSolution + ")' class='right'>Validate!</a>" +
+                "<a href='#' onclick='validateRationing(" + index + ", " + idSolution + ")' class='right'>Validate!</a>" +
                 "</div>" +
                 "</div>" +
                 "</div>";
@@ -222,7 +280,7 @@ function showAllIncorrectSolutions(idSolution) {
 
 function validateRationing(idRationing, idSolution) {
     var justifyRationing = $('#itsNotCorrectAnswerProposedRationings' + idRationing).prop('checked');
-    var actualRationing = this.incorrectSolutions[idSolution].rationings[idRationing];
+    var actualRationing = this.allRationingsToThisQuestions[idRationing];
 
     if (justifyRationing === actualRationing.justifyRationing) {
         $('#resValidateAnswerRationing' + idRationing).text('check_circle');
@@ -243,7 +301,7 @@ function validateRationing(idRationing, idSolution) {
         "idSolution": idSolution,
         "answer": justifyRationing
     };
-
+    // TO-DO: SAVE RATIONING
     saveResponseRationing(justifyRationingAnswer);
     finishThisFollowingRationing(idRationing);
 }
@@ -287,6 +345,7 @@ function finishQuestion() {
     this.answersSolutionStudent.push(answerToSave);
     localStorage.setItem('answersSolutionStudent', JSON.stringify(this.answersSolutionStudent));
 
+    // TO-DO: SAVE ANSWER
     saveAnsweredToReviewByMaster(answerToSave);
 
     $('#finishModal').modal('open');
@@ -300,6 +359,8 @@ function saveAnsweredToReviewByMaster(answerToSave) {
         "answers": answerToSave.answers,
         "idAnswerToReview": this.numSolutionsToReview
     };
+
+    // TO-DO: SAVE ANSWER TO REVIEW 
     this.solutionsToReview.push(answerToReview);
     localStorage.setItem('solutionsToReview', JSON.stringify(this.solutionsToReview));
 }

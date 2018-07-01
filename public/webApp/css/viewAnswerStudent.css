@@ -32,3 +32,7 @@ html {
 .incorrectAnswer {
     color: #d32f2f;
 }
+
+.containerFollowingRationings {
+    padding-left: 20px;
+}

@@ -20,7 +20,6 @@ function init() {
 
     initElements();
     loadInitValues();
-    setDataToPage();
 }
 
 function initElements() {
@@ -41,9 +40,37 @@ function loadData() {
         this.userLogged = JSON.parse(user);
         var question = localStorage.getItem('questionSelected');
         this.questionSelected = JSON.parse(question);
-        var ansSolStudent = localStorage.getItem('answersSolutionStudent');
-        this.answersSolutionStudents = JSON.parse(ansSolStudent);
+        this.saveToken = localStorage.getItem('X-Token');
+
+        this.getSolutionsFromStudents(this.questionSelected.idCuestion).then((res) => {
+            this.answersSolutionStudents = res;
+            setDataToPage();
+        });
     }
+}
+
+function getSolutionsFromStudents(idCuestion) {
+    var solutionsToProcess = [];
+    return new Promise((resolve, reject) => {
+        this.requestApi('GET', 'solutions', null, this.saveToken).then((response) => {
+            if (response !== null && response !== undefined) {
+                var resParsered = JSON.parse(response);
+                var solutionsParsered = resParsered.soluciones;
+                if (solutionsParsered.length > 0) {
+                    solutionsParsered.map((solution) => {
+                        var sol = solution.answer;
+                        if (sol.idQuestion === idCuestion) {
+                            solutionsToProcess.push(sol);
+                        }
+                    });
+                }
+                resolve(solutionsToProcess);
+            }
+        }).catch((err) => {
+            console.log(err);
+            reject(err);
+        });
+    });
 }
 
 function supportsHTML5Storage() {
@@ -55,35 +82,56 @@ function supportsHTML5Storage() {
 }
 
 function setDataToPage() {
-    this.proposedSolutionToQuestionSelected = this.answersSolutionStudents.filter(function (propSol) {
-        return propSol.idQuestion === this.questionSelected.id;
-    });
 
-    $('.firstTitle').text('Question: ' + this.questionSelected.title);
+    $('.firstTitle').text('Question: ' + this.questionSelected.enum_descripcion);
     setAnswersToCollapsible();
 }
 
 function setAnswersToCollapsible() {
-    if (this.proposedSolutionToQuestionSelected.length > 0) {
+    if (this.answersSolutionStudents.length > 0) {
         $('#noAnswers').attr('hidden');
-        this.proposedSolutionToQuestionSelected.map(function (propSolution, index) {
-            var structFollowingSolutions = getAnswersFromFollowingSolutions(propSolution.answers);
-            var structSolution = "<li>" +
-                "<div class='collapsible-header'>" +
-                "<i class='material-icons'>filter_drama</i>" + propSolution.student + "</div>" +
-                "<div class='collapsible-body'>" +
-                "<h5>Answer: " + propSolution.proposedSolution + "</h5>" +
-                "<div id='answersFromStudent" + index + "'></div>" +
-                "</div>" +
-                "</li>";
-            $('#collapsibleOfAnswers').append(structSolution);
-            structFollowingSolutions.forEach(struct => {
+        this.answersSolutionStudents.map(function (propSolution, index) {
+            getRationings(propSolution).then((res) => {
+                var struct = this.getFollowingRationings(res);
+                var structSolution = "<li>" +
+                    "<div class='collapsible-header'>" +
+                    "<i class='material-icons'>filter_drama</i>" + propSolution.student + "</div>" +
+                    "<div class='collapsible-body'>" +
+                    "<h5>Answer: " + propSolution.proposedSolution + "</h5>" +
+                    "<div id='answersFromStudent" + index + "'></div>" +
+                    "</div>" +
+                    "</li>";
+                $('#collapsibleOfAnswers').append(structSolution);
                 $('#answersFromStudent' + index).append(struct);
             });
         });
     } else {
         $('#noAnswers').removeAttr('hidden');
     }
+}
+
+function getRationings(answer) {
+    return new Promise((resolve) => {
+        var rationingToProcess = [];
+        this.requestApi('GET', 'rationings', null, this.saveToken).then((response) => {
+            if (response !== null && response !== undefined) {
+                var resParsered = JSON.parse(response);
+                var rationingsParsered = resParsered.razonamientos;
+                if (rationingsParsered.length > 0) {
+                    rationingsParsered.map((rationing) => {
+                        var rationing = rationing.rationing;
+                        if (rationing.idSolution === answer.idQuestion) {
+                            rationingToProcess.push(rationing);
+                        }
+                    });
+                }
+                resolve(rationingToProcess);
+            }
+        }).catch((err) => {
+            console.log(err);
+            reject(err);
+        });
+    });
 }
 
 function getAnswersFromFollowingSolutions(answers) {
@@ -119,9 +167,10 @@ function getAnswersFromFollowingSolutions(answers) {
 
 function getFollowingRationings(answerStudent) {
     var struct = "<div class='containerFollowingRationings'>";
-    answerStudent.followingSolution.rationings.forEach(rationing => {
+    answerStudent.forEach(rationing => {
         var stateRationing = rationing.justifyRationing;
         var titleRationing = rationing.title;
+        /*
         var rationingStudent = answerStudent.proposedRationingsAnswers.filter(function (propRatio) {
             return propRatio.idRationing === rationing.id;
         });
@@ -131,12 +180,14 @@ function getFollowingRationings(answerStudent) {
         };
         var typeIcon = answerRationingStudent === stateRationing ? 'check_circle' : 'cancel';
         var correctAnswer = answerRationingStudent === stateRationing ? 'correctAnswer' : 'incorrectAnswer';
-
+        */
+        var typeIcon = 'check_circle';
+        var correctAnswer = 'correctAnswer';
         var structRatio = "<div class='followingRationing'>" +
             "<span class='right'>" +
             "<i class='material-icons " + correctAnswer + "'>" + typeIcon + "</i>" +
             "</span>" +
-            "<h5 class='titleFollowingSolution'> Rationing " + rationing.id + ": " + titleRationing + "</h5>" +
+            "<h5 class='titleFollowingSolution'> Rationing " + rationing.idRationing + ": " + titleRationing + "</h5>" +
             "</div>";
         struct += structRatio;
     });

@@ -5,6 +5,8 @@ window.onload = function () {
 var userLogged = null;
 var questionSelected = null;
 var solutionSelected = null;
+var answersAvailable = null;
+var rationingsAvailable = null;
 var numSolutions = 0;
 var numRationings = 0;
 var numSolutionToEdit = 0;
@@ -45,6 +47,8 @@ function loadProfile() {
     if (supportsHTML5Storage()) {
         var user = localStorage.getItem('userLogged');
         this.userLogged = JSON.parse(user);
+
+        this.saveToken = localStorage.getItem('X-Token');
     }
 }
 
@@ -62,61 +66,134 @@ function loadQuestionToView() {
 }
 
 function setDataToPage() {
-    $('#titleQuestionCard').text(this.questionSelected.title);
-    $('#questionTitleAddSolution').text(this.questionSelected.title);
-    if (this.questionSelected.available) {
+    $('#titleQuestionCard').text(this.questionSelected.enum_descripcion);
+    $('#questionTitleAddSolution').text(this.questionSelected.enum_descripcion);
+    if (this.questionSelected.enum_disponible) {
         $('#checkboxAvailable').attr('checked', 'checked');
     }
-    this.numSolutions = this.questionSelected.solutions.length;
-    $('#badgeNumSolutions').text(this.numSolutions ? this.numSolutions : 0);
+    this.getSolutionsFromQuestion().then((res) => {
+        this.answersAvailable = res;
+        this.numSolutions = this.answersAvailable.length;
+        $('#badgeNumSolutions').text(this.numSolutions ? this.numSolutions : 0);
 
-    setSolutionsToCollapsible();
+        setSolutionsToCollapsible();
+    }).catch((err) => {
+        console.log(err);
+    });
+}
+
+function getSolutionsFromQuestion() {
+    var solutionToProcess = [];
+    return new Promise((resolve, reject) => {
+        this.requestApi('GET', 'solutions', null, this.saveToken).then((response) => {
+            if (response !== null && response !== undefined) {
+                var resParsered = JSON.parse(response);
+                var solutionsParsered = resParsered.soluciones;
+                if (solutionsParsered.length > 0) {
+                    solutionsParsered.map((solution) => {
+                        var answer = solution.answer;
+                        var questionId = answer.idQuestion;
+                        if (questionId === this.questionSelected.idCuestion) {
+                            solutionToProcess.push(answer);
+                        }
+                    });
+                }
+                resolve(solutionToProcess);
+            }
+        }).catch((err) => {
+            console.log(err);
+            reject(err);
+        });
+    });
 }
 
 function setSolutionsToCollapsible() {
     if (this.numSolutions > 0) {
         $('#noSolutions').attr('hidden');
-        this.questionSelected.solutions.map(function (sol) {
-            var checked = sol.isGood ? 'checked' : '';
-            var hidden = sol.isGood ? '' : 'hidden';
-            var structSolution = "<li>" +
-                "<div class='collapsible-header' onclick='changeSolutionSelected(" + sol.id + ")'>" +
-                "<i class='material-icons'>filter_drama</i>First</div>" +
-                "<div class='collapsible-body'>" +
-                "<h5>Answer: " + sol.title + "</h5>" +
-                "<label>" +
-                "<input type='checkbox' " + checked + " disabled/>" +
-                "<span>Good</span>" +
-                "</label>" +
-                "<div class='row buttonRationing'>" +
-                "<a href='#addRationing' class='modal-trigger' " + hidden + ">Add Rationing</a>" +
-                "<a href='#' " + hidden + " onclick='showRationing(" + sol.id + ")'>Show rationings</a>" +
-                "<a href='#' onclick='editSolution(" + sol.id + ")' " + !hidden + ">Edit solution</a>" +
-                "</div>" +
-                "</div>" +
-                "</li>";
-            $('#collapsibleOfSolutions').append(structSolution)
+        this.answersAvailable.map(function (answer) {
+            this.getIfBadAnswer(answer).then((hasRationings) => {
+                var checked = !hasRationings ? 'checked' : '';
+                var hidden = !hasRationings ? '' : 'hidden';
+                var structSolution = "<li>" +
+                    "<div class='collapsible-header' onclick='changeSolutionSelected(" + answer.idAnswer + ")'>" +
+                    "<i class='material-icons'>filter_drama</i>First</div>" +
+                    "<div class='collapsible-body'>" +
+                    "<h5>Answer: " + answer.proposedSolution + "</h5>" +
+                    "<label>" +
+                    "<input type='checkbox' " + checked + " disabled/>" +
+                    "<span>Good</span>" +
+                    "</label>" +
+                    "<div class='row buttonRationing'>" +
+                    "<a href='#' onclick='showAddRationing(" + answer.idAnswer + ")' class='modal-trigger' " + hidden + ">Add Rationing</a>" +
+                    "<a href='#' " + hidden + " onclick='showRationing(" + answer.idAnswer + ")'>Show rationings</a>" +
+                    "<a href='#' onclick='editSolution(" + answer.idAnswer + ")' " + !hidden + ">Edit solution</a>" +
+                    "</div>" +
+                    "</div>" +
+                    "</li>";
+                $('#collapsibleOfSolutions').append(structSolution)
+            });
         });
     } else {
         $('#noSolutions').removeAttr('hidden');
     }
 }
 
-function changeSolutionSelected(idSolution) {
-    this.solutionSelected = this.questionSelected.solutions.filter(function (solution) {
-        return solution.id === idSolution;
+function getIfBadAnswer(answer) {
+    return new Promise((resolve) => {
+        var answerId = answer.idAnswer;
+        var rationingsToProcess = [];
+        this.requestApi('GET', 'rationings', null, this.saveToken).then((res) => {
+            if (res !== null && res !== undefined) {
+                var resParsered = JSON.parse(res);
+                var rationingsParsered = resParsered.razonamientos;
+                if (rationingsParsered.length > 0) {
+                    rationingsParsered.map((rationing) => {
+                        var rationing = rationing.rationing;
+                        var solutionId = rationing.idSolution;
+                        if (solutionId === answerId) {
+                            rationingsToProcess.push(rationing);
+                        }
+                    });
+                }
+                this.rationingsAvailable = rationingsToProcess;
+                resolve(rationingsToProcess.length === 0);
+            }
+        }).catch((err) => {
+            console.log(err);
+        });
     });
-    this.numRationings = this.solutionSelected[0].rationings !== undefined ? this.solutionSelected[0].rationings.length : 0;
+}
+
+function changeSolutionSelected(idAnswer) {
+    this.solutionSelected = this.answersAvailable.filter(function (answer) {
+        return answer.idAnswer === idAnswer;
+    });
+    this.numRationings = this.rationingsAvailable !== undefined ? this.rationingsAvailable.length : 0;
     if ($('#rationingsContainer').is(':visible')) {
         $('#rationingsContainer').hide();
     }
 }
 
-function editSolution(idSolution) {
+function confirmEditSolution() {
+    var questionTA = $('#questionTitle').val();
+    $('#questionTitle').val('');
+
+    var questionObj = {
+        "enum_descripcion": questionTA,
+        "creador": this.questionSelected.proposedSolution,
+        "enum_disponible": this.questionSelected.enum_disponible
+    };
+
+    var questionParsered = JSON.stringify(questionObj);
+    this.requestApi('PUT', 'questions/' + this.questionSelected.idCuestion, questionParsered, this.saveToken).then((res) => {
+        this.backToPreviousPage();
+    });
+}
+
+function editSolution(idAnswer) {
     this.editSolutionMode = true;
-    this.numSolutionToEdit = idSolution;
-    $('#questionSolutionTA').val(this.solutionSelected[0].title);
-    this.questionSelected.solutions.splice(this.numSolutionToEdit, 1);
+    this.numSolutionToEdit = idAnswer;
+    $('#questionSolutionTA').val(this.solutionSelected[0].proposedSolution);
     $('#addSolution').modal('open');
 }
 
@@ -127,38 +204,83 @@ function addSolution() {
     var isBadSolution = $('#goodSolutionCheck').prop('checked');
     $('#goodSolutionCheck').removeProp('checked');
 
-    this.numSolution = this.editSolutionMode ? this.numSolutionToEdit : this.numSolutions;
+    this.numSolution = this.editSolutionMode ? this.numSolutionToEdit : this.questionSelected.idCuestion;
 
-    var solutionObj = {
-        "title": solutionTA,
-        "id": this.numSolution,
-        "isGood": isBadSolution,
-        "rationings": []
-    };
-
-    if (isBadSolution) {
-        var solutionRationingTA = $('#questionRationingTA').val();
-        $('#questionRationingTA').val('');
-
-        var isJustify = $('#justifyRationingCheckAddSolution').prop('checked');
-        $('#justifyRationingCheckAddSolution').removeProp('checked');
+    if (solutionTA !== "") {
         var solutionObj = {
-            "title": solutionTA,
-            "id": this.numSolution,
-            "isGood": isBadSolution,
-            "rationings": [{
-                "title": solutionRationingTA,
-                "id": this.numRationings,
-                "justifyRationing": isJustify
-            }]
+            "idQuestion": this.numSolution,
+            "student": this.userLogged.username,
+            "questionTitle": this.questionSelected.enum_descripcion,
+            "proposedSolution": solutionTA,
+            "isGood": isBadSolution
         };
-        this.numRationings++;
+
+        var solutionParsered = JSON.stringify(solutionObj);
+
+        this.saveSolution(solutionParsered).then(() => {
+            if (isBadSolution) {
+                var solutionRationingTA = $('#questionRationingTA').val();
+                $('#questionRationingTA').val('');
+
+                var isJustify = $('#justifyRationingCheckAddSolution').prop('checked');
+                $('#justifyRationingCheckAddSolution').removeProp('checked');
+
+                var rationingObj = {
+                    "idSolution": this.numSolution,
+                    "justifyRationing": isJustify,
+                    "title": solutionRationingTA
+                };
+                this.numRationings++;
+                var rationingParsered = JSON.stringify(rationingObj);
+                this.saveRationing(rationingParsered).then(() => {
+                    this.editSolutionMode = false;
+                    saveQuestion();
+                });
+            } else {
+                this.editSolutionMode = false;
+                saveQuestion();
+            }
+        });
+    } else {
+        if (isBadSolution) {
+            var solutionRationingTA = $('#questionRationingTA').val();
+            $('#questionRationingTA').val('');
+
+            var isJustify = $('#justifyRationingCheckAddSolution').prop('checked');
+            $('#justifyRationingCheckAddSolution').removeProp('checked');
+
+            var rationingObj = {
+                "idSolution": this.numSolution,
+                "justifyRationing": isJustify,
+                "title": solutionRationingTA
+            };
+            var rationingParsered = JSON.stringify(rationingObj);
+            this.numRationings++;
+            this.saveRationing(rationingParsered).then(() => {
+                this.editSolutionMode = false;
+                saveQuestion();
+            });
+        } else {
+            this.editSolutionMode = false;
+            saveQuestion();
+        }
     }
+}
 
-    this.questionSelected.solutions.push(solutionObj);
-    this.editSolutionMode = false;
+function saveRationing(rationing) {
+    return new Promise((resolve) => {
+        this.requestApi('POST', 'rationings', rationing, this.saveToken).then((res) => {
+            resolve();
+        });
+    })
+}
 
-    saveQuestion();
+function saveSolution(solution) {
+    return new Promise((resolve) => {
+        this.requestApi('POST', 'solutions', solution, this.saveToken).then((res) => {
+            resolve();
+        });
+    })
 }
 
 function addRationing() {
@@ -170,12 +292,20 @@ function addRationing() {
 
     var rationingObj = {
         "title": solutionAddRationingTA,
-        "id": this.numRationings,
+        "idSolution": this.numSolution,
         "justifyRationing": isJustify
     };
 
-    this.solutionSelected[0].rationings.push(rationingObj);
-    saveQuestion();
+    var rationingParsered = JSON.stringify(rationingObj);
+    this.saveRationing(rationingParsered).then(() => {
+        this.numRationings++;
+        saveQuestion();
+    });
+}
+
+function showAddRationing(idAnswer) {
+    this.numSolution = idAnswer;
+    $('#addRationing').modal('open');
 }
 
 function showRationing(idSolution) {
@@ -191,15 +321,15 @@ function showRationing(idSolution) {
 
 function setRationingsToCollapsible(idSolution) {
     $('#noRationings').attr('hidden');
-    this.solutionSelected[0].rationings.map(function (sol) {
-        var isChecked = sol.justifyRationing ? 'checked' : '';
-        var isJustify = sol.justifyRationing ? 'Justify' : 'Not justify';
-        var isJustifyColor = sol.justifyRationing ? 'justifySwitch' : 'notJustifySwitch';
+    this.rationingsAvailable.map(function (rationing) {
+        var isChecked = rationing.justifyRationing ? 'checked' : '';
+        var isJustify = rationing.justifyRationing ? 'Justify' : 'Not justify';
+        var isJustifyColor = rationing.justifyRationing ? 'justifySwitch' : 'notJustifySwitch';
         var structSolution = "<li class='ration'>" +
             "<div class='collapsible-header'>" +
             "<i class='material-icons'>filter_drama</i>First</div>" +
             "<div class='collapsible-body'>" +
-            "<h5>Ration: " + sol.title + "</h5>" +
+            "<h5>Ration: " + rationing.title + "</h5>" +
             "<div class='switch'>" +
             "<label class='lblAvailable " + isJustifyColor + "'>" +
             "<input type='checkbox' " + isChecked + " disabled>" +
@@ -215,15 +345,6 @@ function saveQuestion() {
     setAvailableQuestion();
     localStorage.setItem('questionSelected', JSON.stringify(this.questionSelected));
 
-    var questions = localStorage.getItem('questionsMaster');
-    var questionsParsered = JSON.parse(questions);
-
-    var newQuestions = questionsParsered.filter(function (question) {
-        return question.id !== this.questionSelected.id;
-    });
-
-    newQuestions.push(this.questionSelected);
-    localStorage.setItem('questionsMaster', JSON.stringify(newQuestions));
     if (!this.editSolutionMode) {
         this.numSolutions++;
     }
@@ -232,7 +353,7 @@ function saveQuestion() {
 
 function setAvailableQuestion() {
     var isChecked = $('#checkboxAvailable').prop("checked");
-    this.questionSelected.available = isChecked;
+    this.questionSelected.enum_disponible = isChecked;
 }
 
 function backToPreviousPage() {

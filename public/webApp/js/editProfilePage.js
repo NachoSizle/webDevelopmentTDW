@@ -20,6 +20,8 @@ function loadProfile() {
     if (supportsHTML5Storage()) {
         var user = localStorage.getItem('userLogged');
         this.userLogged = JSON.parse(user);
+
+        this.saveToken = localStorage.getItem('X-Token');
         setInitData();
     }
 }
@@ -57,8 +59,57 @@ function setAllLabels() {
 }
 
 function saveData() {
-    console.log('Save');
-    redirectToProfile();
+    var userInput = $("#userName").val();
+    var emailInput = $("#userEmail").val();
+    var chkMaster = $('#chkMaster').prop('checked');
+    var chkAdmin = $('#chkAdmin').prop('checked');
+    var chkEnabled = $('#chkEnabled').prop('checked');
+
+    var userData = {};
+
+    if (userInput !== this.userLogged.username) {
+        userData['username'] = userInput;
+    }
+
+    if (emailInput !== this.userLogged.email) {
+        userData['email'] = emailInput;
+    }
+
+    if (chkMaster !== this.userLogged.maestro) {
+        userData['isMaestro'] = chkMaster;
+    }
+
+    if (chkAdmin !== this.userLogged.admin) {
+        userData['isAdmin'] = chkAdmin;
+    }
+
+    if (chkEnabled !== this.userLogged.enabled) {
+        userData['enabled'] = chkEnabled;
+    }
+
+    var userDataJSON = JSON.stringify(userData);
+
+    if (userDataJSON !== {}) {
+        saveUserData(userDataJSON);
+    } else {
+        redirectToProfile();
+    }
+}
+
+function saveUserData(userDataParsered) {
+    this.requestApi('PUT', 'users/' + this.userLogged.id, userDataParsered, this.saveToken).then((response) => {
+        if (response !== null && response !== undefined) {
+            var resParsered = JSON.parse(response);
+            this.userSelected = resParsered['usuario'];
+            localStorage.setItem('userLogged', JSON.stringify(this.userSelected));
+            redirectToProfile();
+        }
+    }).catch((err) => {
+        if (err.status === 400) {
+            //Mostrar modal
+        }
+        console.log(err);
+    });
 }
 
 function redirectToProfile() {

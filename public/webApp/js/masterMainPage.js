@@ -2,6 +2,7 @@ window.onload = function () {
     init();
 };
 
+var saveToken = null;
 var userLogged = null;
 var questions = [];
 var numQuestions = 0;
@@ -30,16 +31,43 @@ function initElements() {
 
 function loadProfile() {
     if (supportsHTML5Storage()) {
+
+        this.saveToken = localStorage.getItem('X-Token');
+
         var user = localStorage.getItem('userLogged');
         this.userLogged = JSON.parse(user);
 
         var solutionsReview = localStorage.getItem('solutionsToReview');
         this.solutionsToReview = JSON.parse(solutionsReview);
 
-        var questionsMaster = localStorage.getItem('questionsMaster');
-        this.questions = JSON.parse(questionsMaster);
         setDataToPage();
     }
+}
+
+function getQuestionsFromMaster() {
+    var idMaster = this.userLogged.id;
+    var questionsToProcess = [];
+    return new Promise((resolve, reject) => {
+        this.requestApi('GET', 'questions', null, this.saveToken).then((response) => {
+            if (response !== null && response !== undefined) {
+                var resParsered = JSON.parse(response);
+                var questionsParsered = resParsered.cuestions;
+                if (questionsParsered.length > 0) {
+                    questionsParsered.map((question) => {
+                        var q = question.cuestion;
+                        var creator = q.creador.usuario.id;
+                        if (creator === idMaster) {
+                            questionsToProcess.push(q);
+                        }
+                    });
+                }
+                resolve(questionsToProcess);
+            }
+        }).catch((err) => {
+            console.log(err);
+            reject(err);
+        });
+    });
 }
 
 function supportsHTML5Storage() {
@@ -62,11 +90,9 @@ function getQuestions() {
 
     //LLAMAR A LA API PARA QUE NOS TRAIGA TODAS LAS CUESTIONES
     //QUE ESTAN EN LA BASE DE DATOS PARA EL MAESTRO QUE HA HECHO LOGIN
-    /*
-    var questions = this.userLogged.cuestiones;
-    if (questions.length > 0) {
-        this.getQuestionsFromApi().then((res) => {
-            console.log(res);
+
+    this.getQuestionsFromMaster().then((res) => {
+        if (res.length > 0) {
             this.questions = res;
             this.numQuestions = this.questions.length;
 
@@ -93,68 +119,11 @@ function getQuestions() {
                     "</div>";
                 $('#containerQuestions').append(blockQuestion);
             });
-        }).catch((err) => {
-            console.log(err);
-        });
-        */
-
-
-    this.numQuestions = this.questions.length;
-
-    this.questions.forEach(question => {
-        var checked = question.available ? 'checked' : '';
-        var textChecked = question.available ? 'Available' : 'Not available';
-        var hasSolutionToReview = getSolutionProposedToQuestion(question.id) ? '' : 'hidden';
-        var blockQuestion = "<div class='col s12 m6 hoverable' id='" + question.title + "'>" +
-            "<div class='card blue-grey darken-1'>" +
-            "<div class='card-content white-text noPadBottom'>" +
-            "<span class='card-title'>" + question.title + "</span>" +
-            "<label>" +
-            "<input type='checkbox'" + checked + " disabled/>" +
-            "<span>" + textChecked + "</span>" +
-            "</label>" +
-            "</div>" +
-            "<div class='card-action col s12 m12'>" +
-            "<a href='#' onclick='viewThisQuestion(" + question.id + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View</a>" +
-            "<a href='#remModal' onclick='setQuestion(" + question.id + ")' class='modal-trigger linkBtnCard'><i class='material-icons iconBtnCard'>delete_forever</i>Remove</a>" +
-            "<a href='#' onclick='viewAnswerFromStudents(" + question.id + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View Answers</a>" +
-            "<a href='#' " + hasSolutionToReview + " onclick='reviewAnswerFromStudents(" + question.id + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>sim_card_alert</i>Review answers</a>" +
-            "</div>" +
-            "</div>" +
-            "</div>";
-        $('#containerQuestions').append(blockQuestion);
-    });
-}
-
-function getQuestionsFromApi() {
-    var questions = this.userLogged.cuestiones;
-    var questionsArrayPromise = [];
-
-    return new Promise((resolve, reject) => {
-        questions.forEach((questionId) => {
-            var promise = new Promise((resolve, reject) => {
-                this.requestApi('GET', 'questions/' + questionId, null).then((response) => {
-                    console.log(response);
-                    if (response !== null && response !== undefined) {
-                        var resParsered = JSON.parse(response);
-                        var resGoodData = this.parseCuestion(resParsered);
-                        resolve(resGoodData);
-                    }
-                }).catch((err) => {
-                    console.log(err);
-                    reject(err);
-                });
-            });
-            questionsArrayPromise.push(promise);
-        });
-
-        Promise.all(questionsArrayPromise).then((values) => {
-            console.log(values);
-            resolve(values);
-        }).catch((err) => {
-            console.log(err);
-            reject(err);
-        });
+        } else {
+            $('.secondTitle').text('You don\'t have any questions yet. Do you want to create one question?');
+        }
+    }).catch((err) => {
+        console.log(err);
     });
 }
 
@@ -203,7 +172,7 @@ function setQuestion(questionId) {
 
 function setSelectedQuestion(questionId) {
     this.questions.map(function (question) {
-        if (question.id === questionId) {
+        if (question.idCuestion === questionId) {
             this.questionSelected = question;
         }
     });
@@ -217,26 +186,30 @@ function addQuestion() {
     var numElem = this.numQuestions + 1;
 
     var newQuestion = {
-        "title": taValue,
-        "id": numElem,
-        "available": false,
-        "solutions": []
+        "enum_descripcion": taValue,
+        "creador": this.userLogged.id,
+        "enum_disponible": false
     };
 
-    this.questions.push(newQuestion);
-    localStorage.setItem('questionsMaster', JSON.stringify(this.questions));
-    getQuestions();
+    var newQuestionParsered = JSON.stringify(newQuestion);
+
+    this.requestApi('POST', 'questions', newQuestionParsered, this.saveToken).then((res) => {
+        if (res !== null && res !== undefined) {
+            getQuestions();
+        }
+    }).catch((err) => {
+        $('#warningText').text('You not a Admin user');
+        $('#warningModal').modal('open');
+    });
 }
 
 function removeQuestion() {
     var questionParsered = JSON.parse(localStorage.getItem('questionSelected'));
-    var questionId = questionParsered.id;
-    this.questions = this.questions.filter(function (question) {
-        return question.id !== questionId;
+    var questionId = questionParsered.idCuestion;
+
+    this.requestApi('DELETE', 'questions/' + questionId, null, this.saveToken).then(() => {
+        getQuestions();
     });
-    localStorage.setItem('questionsMaster', JSON.stringify(this.questions));
-    localStorage.removeItem('questionSelected');
-    getQuestions();
 }
 
 function logout() {
