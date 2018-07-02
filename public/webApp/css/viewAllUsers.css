@@ -1,0 +1,21 @@
+body,
+html {
+    height: 100%;
+}
+
+.secondTitle {
+    margin-left: 10px;
+}
+
+.alignToText {
+    position: relative;
+    bottom: -7px;
+}
+
+.inputCheckboxes {
+    margin-top: 25px;
+}
+
+.card-content {
+    padding-bottom: 0px !important;
+}

@@ -5,6 +5,7 @@ window.onload = function () {
 var saveToken = null;
 var answersSolutionStudent = [];
 var questionsWithoutAnswer = [];
+var questionsSolutionStudent = [];
 
 function init() {
     initElements();
@@ -90,7 +91,6 @@ function getQuestionsAnsweredByUser() {
                 resolve(questionsAnswered);
             }
         }).catch((err) => {
-            console.log(err);
             reject(err);
         });
     });
@@ -117,15 +117,30 @@ function getQuestions() {
                     this.answersSolutionStudent.map((answer) => {
                         var idQuestion = answer.idQuestion;
                         this.questionsAvailable.map((question) => {
-                            if (question.idQuestion !== idQuestion) {
-                                this,
-                                questionsWithoutAnswer.push(question);
+                            if (question.idCuestion !== idQuestion) {
+                                this.questionsWithoutAnswer.push(question);
+                            } else {
+                                this.questionsSolutionStudent.push(question);
                             }
                         })
                     });
                 } else {
                     this.questionsWithoutAnswer = this.questionsAvailable;
                 }
+
+                // ELIMINAMOS LAS PREGUNTAS QUE EL USUARIO HA CONTESTADO DE questionsWithoutStudent
+                var aux = [];
+                this.questionsSolutionStudent.forEach((q) => {
+                    this.questionsWithoutAnswer.map((question, index) => {
+                        if (question.idCuestion === q.idCuestion) {
+                            aux.push(index);
+                        }
+                    });
+                });
+
+                aux.forEach((i) => {
+                    this.questionsWithoutAnswer.splice(i, 1);;
+                });
 
                 this.makeStructToQuestionsWithAnswer();
                 this.makeStructToQuestionsWithoutAnswer();
@@ -134,7 +149,19 @@ function getQuestions() {
                 var textQuestionsAvailable = this.questionsWithoutAnswer.length === 0 ? 'Congratulations! You have answered all the questions.' : 'Questions available!';
                 $('#headerAvailableQuestions').text(textQuestionsAvailable);
                 $('#headerAnsweredQuestions').text(textQuestionsAnswered);
-            });
+            }).catch((err) => {
+                if (err.status === 404) {
+                    this.answersSolutionStudent = [];
+                    this.questionsWithoutAnswer = this.questionsAvailable;
+                    this.makeStructToQuestionsWithAnswer();
+                    this.makeStructToQuestionsWithoutAnswer();
+
+                    var textQuestionsAnswered = this.answersSolutionStudent.length === 0 ? 'You have not answered any questions yet' : 'Questions answered!';
+                    var textQuestionsAvailable = this.questionsWithoutAnswer.length === 0 ? 'Congratulations! You have answered all the questions.' : 'Questions available!';
+                    $('#headerAvailableQuestions').text(textQuestionsAvailable);
+                    $('#headerAnsweredQuestions').text(textQuestionsAnswered);
+                }
+            })
         }
     });
 }
@@ -145,7 +172,7 @@ function makeStructToQuestionsWithoutAnswer() {
         if (isAvailable) {
             var checked = isAvailable ? 'checked' : '';
             var textChecked = isAvailable ? 'Available' : 'Not available';
-            var blockQuestion = "<div class='col s12 m6 hoverable' id='" + question.enum_descripcion + "'>" +
+            var blockQuestion = "<div class='col s6 m6 hoverable' id='" + question.enum_descripcion + "'>" +
                 "<div class='card blue-grey darken-1'>" +
                 "<div class='card-content white-text'>" +
                 "<span class='card-title'>" + question.enum_descripcion + "</span>" +
@@ -161,12 +188,10 @@ function makeStructToQuestionsWithoutAnswer() {
 }
 
 function makeStructToQuestionsWithAnswer() {
-    this.answersSolutionStudent.forEach(question => {
+    this.questionsSolutionStudent.forEach(question => {
         var isAvailable = question.enum_disponible;
         if (isAvailable) {
-            var checked = isAvailable ? 'checked' : '';
-            var textChecked = isAvailable ? 'Available' : 'Not available';
-            var blockQuestion = "<div class='col s12 m12 hoverable' id='" + question.enum_descripcion + "'>" +
+            var blockQuestion = "<div class='col s6 m6 hoverable' id='" + question.enum_descripcion + "'>" +
                 "<div class='card blue-grey darken-1'>" +
                 "<div class='card-content white-text'>" +
                 "<span class='card-title'>" + question.enum_descripcion + "</span>" +

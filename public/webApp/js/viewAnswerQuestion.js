@@ -4,7 +4,6 @@ window.onload = function () {
 
 var userLogged = null;
 var proposedSolution = null;
-var answerSolutionStudent = [];
 var questionSelected = null;
 var numSolutions = 0;
 var actualSolution = null;
@@ -58,10 +57,21 @@ function loadProfile() {
                     this.allRationingsToThisQuestions = rationings;
                     this.totalNumRationings = rationings.length;
                     this.setDataToPage();
-                });
+                }).catch(() => {
+                    this.allRationingsToThisQuestions = [];
+                    this.totalNumRationings = 0;
+                    this.setDataToPage();
+                })
+            }
+        }).catch((err) => {
+            if (err.status === 404) {
+                this.incorrectSolutions = [];
+                this.numSolutions = 0;
+                this.allRationingsToThisQuestions = [];
+                this.totalNumRationings = 0;
+                this.setDataToPage();
             }
         });
-
     }
 }
 
@@ -111,7 +121,9 @@ function calcTotalNumRationings() {
                 resolve(rationingFromThisAnswer);
             }
         }).catch((err) => {
-            console.log(err);
+            if (err.status === 404) {
+                reject();
+            }
             reject(err);
         });
     });
@@ -136,11 +148,37 @@ function addSolution() {
 
     this.proposedSolution = proposeSolutionTA;
 
-    $('#porposeSolutionText').text(proposeSolutionTA);
-    $('#btnAddProposeSolution').addClass('disabled');
-    $('#proposedSolutionsContainer').removeClass('scale-out').addClass('scale-in');
-    $('#proposedSolutionsContainer').height('auto');
-    checkIfQuestionHasFollowingSolutions();
+    // TO-DO: SAVE ANSWER
+    var proposeSolutionStudentAnswer = {
+        "idQuestion": this.questionSelected.idCuestion,
+        "student": this.userLogged.username,
+        "questionTitle": this.questionSelected.enum_descripcion,
+        "proposedSolution": this.proposedSolution
+    };
+
+    var propAns = JSON.stringify(proposeSolutionStudentAnswer);
+
+    this.saveAnswerFromStudent(propAns).then(() => {
+        console.log('Saved!');
+        // TO-DO: SPINNER
+        $('#porposeSolutionText').text(proposeSolutionTA);
+        $('#btnAddProposeSolution').addClass('disabled');
+        $('#proposedSolutionsContainer').removeClass('scale-out').addClass('scale-in');
+        $('#proposedSolutionsContainer').height('auto');
+        checkIfQuestionHasFollowingSolutions();
+    });
+}
+
+function saveAnswerFromStudent(proposedAnswer) {
+    return new Promise((resolve) => {
+        this.requestApi('POST', 'solutions', proposedAnswer, this.saveToken).then((response) => {
+            if (response !== null && response !== undefined) {
+                resolve();
+            }
+        }).catch((err) => {
+            console.log(err);
+        });
+    });
 }
 
 function checkIfQuestionHasFollowingSolutions() {
@@ -188,13 +226,7 @@ function validateAnswer(idSolution) {
         }
         $('#resValidateAnswer' + idSolution).addClass('incorrectAnswer');
     }
-    // TO-DO: SAVE ANSWER
-    var proposeSolutionStudentAnswer = {
-        "answer": itsCorrect,
-        "followingSolution": this.incorrectSolutions[idSolution],
-        "idAnswer": this.incorrectSolutions[idSolution].id
-    };
-    this.answerSolutionStudent.push(proposeSolutionStudentAnswer);
+
     showContainerAnswerRationing(idSolution);
 }
 
@@ -224,25 +256,29 @@ function saveProposeRationing(idSolution) {
     $('#textHeaderProposeRationing' + idSolution).text('Your proposed rationing: ');
     $('#textProposeRationing' + idSolution).text(proposedRationing);
 
-    // TO-DO: SAVE RATIONING
+    // TO-DO: SAVE PROPOSED RATIONING
     var proposedRationingAnswer = {
-        "proposedRationing": proposedRationing,
-        "idSolution": idSolution,
-        "user": this.userLogged.user,
+        "title": proposedRationing,
+        "idSolution": this.incorrectSolutions[idSolution].idAnswer,
+        "justifyRationing": false
     };
 
-    addProposeRationingToAnswer(proposedRationingAnswer);
-
-    $('#actionSaveProposeRationing' + idSolution).prop('hidden', true);
-
-    showAllIncorrectSolutions(idSolution);
+    var propRationing = JSON.stringify(proposedRationingAnswer);
+    this.saveProposedRationing(propRationing).then(() => {
+        $('#actionSaveProposeRationing' + idSolution).prop('hidden', true);
+        showAllIncorrectSolutions(idSolution);
+    });
 }
 
-function addProposeRationingToAnswer(proposedRationingAnswer) {
-    this.answerSolutionStudent.forEach(answer => {
-        if (answer.idAnswer === proposedRationingAnswer.idSolution) {
-            answer["proposeRationing"] = proposedRationingAnswer;
-        }
+function saveProposedRationing(propRationing) {
+    return new Promise((resolve) => {
+        this.requestApi('POST', 'rationings', propRationing, this.saveToken).then((response) => {
+            if (response !== null && response !== undefined) {
+                resolve();
+            }
+        }).catch((err) => {
+            console.log(err);
+        });
     });
 }
 
@@ -308,14 +344,6 @@ function validateRationing(idRationing, idSolution) {
 
 function saveResponseRationing(justifyRationingStudentAnswer) {
     this.numRationingsAnswered++;
-    this.answerSolutionStudent.forEach(answer => {
-        if (answer.idAnswer === justifyRationingStudentAnswer.idSolution) {
-            if (answer["proposedRationingsAnswers"] === undefined) {
-                answer["proposedRationingsAnswers"] = [];
-            }
-            answer["proposedRationingsAnswers"].push(justifyRationingStudentAnswer);
-        }
-    });
 
     if (this.numProposeRationingsAnswered === this.incorrectSolutions.length &&
         this.numRationingsAnswered === this.totalNumRationings) {
@@ -338,7 +366,6 @@ function finishQuestion() {
         "student": this.userLogged.name,
         "idQuestion": this.questionSelected.id,
         "proposedSolution": this.proposedSolution,
-        "answers": this.answerSolutionStudent,
         "idAnswer": this.numSolutionsToReview
     };
 

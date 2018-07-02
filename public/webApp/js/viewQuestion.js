@@ -178,16 +178,13 @@ function confirmEditSolution() {
     var questionTA = $('#questionTitle').val();
     $('#questionTitle').val('');
 
-    var questionObj = {
-        "enum_descripcion": questionTA,
-        "creador": this.questionSelected.proposedSolution,
-        "enum_disponible": this.questionSelected.enum_disponible
-    };
+    this.questionSelected.enum_descripcion = questionTA;
 
-    var questionParsered = JSON.stringify(questionObj);
-    this.requestApi('PUT', 'questions/' + this.questionSelected.idCuestion, questionParsered, this.saveToken).then((res) => {
-        this.backToPreviousPage();
-    });
+    var questionParsered = JSON.stringify(this.questionSelected);
+    localStorage.setItem('questionSelected', questionParsered);
+
+    $('#titleQuestionCard').text(this.questionSelected.enum_descripcion);
+    $('#questionTitleAddSolution').text(this.questionSelected.enum_descripcion);
 }
 
 function editSolution(idAnswer) {
@@ -217,7 +214,8 @@ function addSolution() {
 
         var solutionParsered = JSON.stringify(solutionObj);
 
-        this.saveSolution(solutionParsered).then(() => {
+        this.saveSolution(solutionParsered).then((solutionSaved) => {
+            var solutionSavedParsered = JSON.parse(solutionSaved);
             if (isBadSolution) {
                 var solutionRationingTA = $('#questionRationingTA').val();
                 $('#questionRationingTA').val('');
@@ -226,7 +224,7 @@ function addSolution() {
                 $('#justifyRationingCheckAddSolution').removeProp('checked');
 
                 var rationingObj = {
-                    "idSolution": this.numSolution,
+                    "idSolution": solutionSavedParsered.answer.idAnswer,
                     "justifyRationing": isJustify,
                     "title": solutionRationingTA
                 };
@@ -278,6 +276,14 @@ function saveRationing(rationing) {
 function saveSolution(solution) {
     return new Promise((resolve) => {
         this.requestApi('POST', 'solutions', solution, this.saveToken).then((res) => {
+            resolve(res);
+        });
+    })
+}
+
+function updateQuestion(question) {
+    return new Promise((resolve) => {
+        this.requestApi('PUT', 'questions/' + this.questionSelected.idCuestion, question, this.saveToken).then((res) => {
             resolve();
         });
     })
@@ -343,12 +349,28 @@ function setRationingsToCollapsible(idSolution) {
 
 function saveQuestion() {
     setAvailableQuestion();
-    localStorage.setItem('questionSelected', JSON.stringify(this.questionSelected));
 
-    if (!this.editSolutionMode) {
-        this.numSolutions++;
-    }
-    backToPreviousPage();
+    this.questionSelected.estado = this.questionSelected.enum_disponible ? 'abierta' : 'cerrada';
+
+    var questionToUpdate = {
+        "enum_descripcion": this.questionSelected.enum_descripcion,
+        "creador": this.questionSelected.creador.usuario.id,
+        "enum_disponible": this.questionSelected.enum_disponible,
+        "estado": this.questionSelected.estado
+    };
+    var questionUpdParsered = JSON.stringify(questionToUpdate);
+
+    var questionParsered = JSON.stringify(this.questionSelected);
+    localStorage.setItem('questionSelected', questionParsered);
+
+    this.updateQuestion(questionUpdParsered).then(() => {
+        if (!this.editSolutionMode) {
+            this.numSolutions++;
+        }
+        backToPreviousPage();
+    }).catch(() => {
+        // TO-DO: SHOW ERROR MODAL
+    });
 }
 
 function setAvailableQuestion() {

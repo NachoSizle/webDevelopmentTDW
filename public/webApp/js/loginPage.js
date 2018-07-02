@@ -131,9 +131,14 @@ function getUser() {
         if (response) {
             var resParsered = JSON.parse(response);
             this.userSelected = resParsered['User']['usuario'];
-            localStorage.setItem('userLogged', JSON.stringify(this.userSelected));
             localStorage.setItem('X-Token', resParsered['X-Token']);
-            resolveTo();
+            if (this.userSelected.enabled) {
+                localStorage.setItem('userLogged', JSON.stringify(this.userSelected));
+                resolveTo();
+            } else {
+                // TO-DO: SHOW ERROR USER NOT ENABLED MODAL
+                $('#notEnabledModal').modal('open');
+            }
         }
     }).catch((err) => {
         console.log(err);
