@@ -157,7 +157,6 @@ function addSolution() {
 
     this.saveAnswerFromStudent(propAns).then(() => {
         console.log('Saved!');
-        // TO-DO: SPINNER
         $('#porposeSolutionText').text(proposeSolutionTA);
         $('#btnAddProposeSolution').addClass('disabled');
         $('#proposedSolutionsContainer').removeClass('scale-out').addClass('scale-in');

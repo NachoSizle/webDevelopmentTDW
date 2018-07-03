@@ -371,7 +371,8 @@ function saveQuestion() {
         }
         backToPreviousPage();
     }).catch(() => {
-        // TO-DO: SHOW ERROR MODAL
+        $('warningText').text('Question not update');
+        $('#errModal').modal('open');
     });
 }
 

@@ -136,7 +136,6 @@ function getUser() {
                 localStorage.setItem('userLogged', JSON.stringify(this.userSelected));
                 resolveTo();
             } else {
-                // TO-DO: SHOW ERROR USER NOT ENABLED MODAL
                 $('#notEnabledModal').modal('open');
             }
         }

@@ -41,6 +41,18 @@ function loadProfile() {
         this.solutionsToReview = JSON.parse(solutionsReview) ? JSON.parse(solutionsReview) : [];
         this.numSolutionsToReview = this.solutionsToReview.length;
         if (this.solutionsToReview.length > 0) {
+            var answerReviewed = localStorage.getItem('answerReviewed');
+            var answerReviewedParsered = JSON.parse(answerReviewed) ? JSON.parse(answerReviewed) : null;
+            if (answerReviewedParsered !== null && answerReviewedParsered !== undefined) {
+                var arrAux = [];
+                this.solutionsToReview.map((sol) => {
+                    if (sol.answer.idAnswer !== answerReviewedParsered.answer.idAnswer) {
+                        arrAux.push(sol);
+                    }
+                });
+                localStorage.setItem('solutionsToReview', JSON.stringify(arrAux));
+                this.solutionsToReview = arrAux;
+            }
             this.setQuestionsToReview();
         } else {
             $('.answerStudentsTitle').text('No hay nada que corregir! Descansa!');

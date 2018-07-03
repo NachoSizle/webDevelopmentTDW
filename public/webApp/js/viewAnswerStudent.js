@@ -48,10 +48,12 @@ function loadData() {
         if (this.reviewMode) {
             this.answerToReview = JSON.parse(localStorage.getItem('answerToReview'));
             if (this.answerToReview) {
+                this.questionSelected = this.answerToReview.question;
                 $('#noAnswers').attr('hidden');
                 this.setDataToPage();
             } else {
-                // TO-DO: SHOW ERROR MODAL
+                $('warningText').text('Question not update');
+                $('#errModal').modal('open');
                 $('#noAnswers').removeAttr('hidden');
             }
         } else {
@@ -143,9 +145,11 @@ function saveCorrection() {
     var answerParsered = JSON.stringify(answerToSave);
 
     this.requestApi('PUT', 'solutions/' + answer.idAnswer, answerParsered, this.saveToken).then((res) => {
-        console.log(res);
-        // TO-DO: SHOW MODAL ALL IS GOING TO BE GOOD AND INFORM TO THE PREVIOUS PAGE
-        this.backToPreviousPage();
+        localStorage.setItem('answerReviewed', JSON.stringify(this.answerToReview));
+        localStorage.removeItem('review');
+        localStorage.removeItem('answerToReview');
+        $('.okText').text('State of this question has been update!');
+        $('#okModal').modal('open');
     });
 }
 
