@@ -36,6 +36,8 @@ function supportsHTML5Storage() {
 }
 
 function setDataToPage() {
+    $('#userLogged')[0].innerText = "User logged: " + this.userLogged["username"];
+
     this.getAllUsers().then((res) => {
         this.users = res;
         this.createContainerForAllUsers();

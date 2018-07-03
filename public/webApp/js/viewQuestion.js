@@ -66,6 +66,8 @@ function loadQuestionToView() {
 }
 
 function setDataToPage() {
+    $('#userLogged')[0].innerText = "User logged: " + this.userLogged["username"];
+
     $('#titleQuestionCard').text(this.questionSelected.enum_descripcion);
     $('#questionTitleAddSolution').text(this.questionSelected.enum_descripcion);
     if (this.questionSelected.enum_disponible) {

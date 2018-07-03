@@ -72,3 +72,10 @@ html {
 .notJustifySwitch {
     color: #e53935 !important;
 }
+
+#userLogged {
+    color: white;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}

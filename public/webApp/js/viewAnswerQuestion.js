@@ -10,8 +10,7 @@ var actualSolution = null;
 var numProposeRationingsAnswered = 0;
 var numRationingsAnswered = 0;
 var totalNumRationings = 0;
-var solutionsToReview = [];
-var numSolutionsToReview = 0;
+var answerSaved = null;
 
 function init() {
     initElements();
@@ -43,10 +42,6 @@ function loadProfile() {
 
         var answerResponse = localStorage.getItem('answersSolutionStudent');
         this.answersSolutionStudent = JSON.parse(answerResponse);
-
-        var solutionsReview = localStorage.getItem('solutionsToReview');
-        this.solutionsToReview = JSON.parse(solutionsReview);
-        this.numSolutionsToReview = this.solutionsToReview.length;
 
         // SACAMOS LAS SOLUCIONES DADAS A ESTA CUESTION
         this.getAllAnswersToThisQuestion().then((res) => {
@@ -138,6 +133,8 @@ function supportsHTML5Storage() {
 }
 
 function setDataToPage() {
+    $('#userLogged')[0].innerText = "User logged: " + this.userLogged["username"];
+
     $('#titleQuestionCard').text(this.questionSelected.enum_descripcion);
     $('#questionTitleAddSolution').text(this.questionSelected.enum_descripcion);
 }
@@ -148,12 +145,12 @@ function addSolution() {
 
     this.proposedSolution = proposeSolutionTA;
 
-    // TO-DO: SAVE ANSWER
     var proposeSolutionStudentAnswer = {
         "idQuestion": this.questionSelected.idCuestion,
         "student": this.userLogged.username,
         "questionTitle": this.questionSelected.enum_descripcion,
-        "proposedSolution": this.proposedSolution
+        "proposedSolution": this.proposedSolution,
+        "isGood": false
     };
 
     var propAns = JSON.stringify(proposeSolutionStudentAnswer);
@@ -173,6 +170,8 @@ function saveAnswerFromStudent(proposedAnswer) {
     return new Promise((resolve) => {
         this.requestApi('POST', 'solutions', proposedAnswer, this.saveToken).then((response) => {
             if (response !== null && response !== undefined) {
+                var answerSaved = JSON.parse(response);
+                this.answerSaved = answerSaved.answer;
                 resolve();
             }
         }).catch((err) => {
@@ -256,7 +255,6 @@ function saveProposeRationing(idSolution) {
     $('#textHeaderProposeRationing' + idSolution).text('Your proposed rationing: ');
     $('#textProposeRationing' + idSolution).text(proposedRationing);
 
-    // TO-DO: SAVE PROPOSED RATIONING
     var proposedRationingAnswer = {
         "title": proposedRationing,
         "idSolution": this.incorrectSolutions[idSolution].idAnswer,
@@ -332,23 +330,7 @@ function validateRationing(idRationing, idSolution) {
         $('#resValidateAnswerRationing' + idRationing).addClass('incorrectAnswer');
     }
 
-    var justifyRationingAnswer = {
-        "idRationing": idRationing,
-        "idSolution": idSolution,
-        "answer": justifyRationing
-    };
-    // TO-DO: SAVE RATIONING
-    saveResponseRationing(justifyRationingAnswer);
     finishThisFollowingRationing(idRationing);
-}
-
-function saveResponseRationing(justifyRationingStudentAnswer) {
-    this.numRationingsAnswered++;
-
-    if (this.numProposeRationingsAnswered === this.incorrectSolutions.length &&
-        this.numRationingsAnswered === this.totalNumRationings) {
-        finishQuestion();
-    }
 }
 
 function finishThisFollowingRationing(idRationing) {
@@ -360,36 +342,16 @@ function finishThisFollowingSolution(idSolution) {
 }
 
 function finishQuestion() {
-    this.numSolutionsToReview++;
     var answerToSave = {
-        "question": this.questionSelected.title,
-        "student": this.userLogged.name,
-        "idQuestion": this.questionSelected.id,
-        "proposedSolution": this.proposedSolution,
-        "idAnswer": this.numSolutionsToReview
+        "question": this.questionSelected,
+        "answer": this.answerSaved
     };
-
-    this.answersSolutionStudent.push(answerToSave);
-    localStorage.setItem('answersSolutionStudent', JSON.stringify(this.answersSolutionStudent));
-
-    // TO-DO: SAVE ANSWER
-    saveAnsweredToReviewByMaster(answerToSave);
+    var solReview = localStorage.getItem('solutionsToReview');
+    var arr = solReview ? JSON.parse(solReview) : [];
+    arr.push(answerToSave);
+    localStorage.setItem('solutionsToReview', JSON.stringify(arr));
 
     $('#finishModal').modal('open');
-}
-
-function saveAnsweredToReviewByMaster(answerToSave) {
-    var answerToReview = {
-        "idQuestion": answerToSave.idQuestion,
-        "student": answerToSave.student,
-        "proposedSolution": answerToSave.proposedSolution,
-        "answers": answerToSave.answers,
-        "idAnswerToReview": this.numSolutionsToReview
-    };
-
-    // TO-DO: SAVE ANSWER TO REVIEW 
-    this.solutionsToReview.push(answerToReview);
-    localStorage.setItem('solutionsToReview', JSON.stringify(this.solutionsToReview));
 }
 
 function backToPreviousPage() {

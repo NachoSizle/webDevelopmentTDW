@@ -38,6 +38,8 @@ function supportsHTML5Storage() {
 }
 
 function setInitData() {
+    $('#userLogged')[0].innerText = "User logged: " + this.userLogged["username"];
+
     $('#userName').text(this.userLogged.username);
     $('#userEmail').text(this.userLogged.email);
 

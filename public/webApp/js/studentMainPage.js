@@ -69,6 +69,7 @@ function getAllQuestions() {
 }
 
 function setDataToPage() {
+    $('#userLogged')[0].innerText = "User logged: " + this.userLogged["username"];
     $('#hiMaster')[0].innerText = "Hola " + this.userLogged["username"];
     getQuestions();
 }
@@ -196,11 +197,21 @@ function makeStructToQuestionsWithAnswer() {
                 "<div class='card-content white-text'>" +
                 "<span class='card-title'>" + question.enum_descripcion + "</span>" +
                 "</div>" +
+                "<div class='card-action'>" +
+                "<a href='#' onclick='viewAnswer(" + question.idCuestion + ")'><i class='material-icons alignToText'>visibility</i> View answer!</a>" +
+                "</div>" +
                 "</div>" +
                 "</div>";
             $('#containerQuestionsAnswered').append(blockQuestion);
         }
     });
+}
+
+function viewAnswer(questionId) {
+    setSelectedQuestion(questionId);
+    localStorage.setItem('onlyUserLogged', true);
+    localStorage.setItem('review', false);
+    window.location.href = "./viewAnswerStudent.html";
 }
 
 function viewThisQuestion(questionId) {

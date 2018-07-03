@@ -3,8 +3,11 @@ html {
     height: 100%;
 }
 
-.firstTitle,
-.secondTitle {
+h5 {
+    margin: 1.0933333333rem 0 1.0933333333rem 0;
+}
+
+.firstTitle {
     margin-left: 10px;
 }
 
@@ -27,12 +30,36 @@ html {
 
 .correctAnswer {
     color: #388e3c;
+    font-size: 30px;
+    position: relative;
+    top: 6px;
+    left: 5px;
 }
 
 .incorrectAnswer {
     color: #d32f2f;
+    font-size: 30px;
+    position: relative;
+    top: 6px;
+    left: 5px;
 }
 
 .containerFollowingRationings {
     padding-left: 20px;
+}
+
+.resText {
+    padding-left: 10px;
+    font-size: 25px;
+}
+
+#userLogged {
+    color: white;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+.actionCollapsibleBody {
+    padding: 0px 10px;
 }

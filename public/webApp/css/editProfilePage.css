@@ -10,3 +10,10 @@
 .btn-signin {
     margin-left: 45%;
 }
+
+#userLogged {
+    color: white;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}

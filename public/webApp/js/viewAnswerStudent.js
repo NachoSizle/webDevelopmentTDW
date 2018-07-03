@@ -4,6 +4,7 @@ window.onload = function () {
 
 var userLogged = null;
 var questionSelected = null;
+var answerToReview = null;
 var answersSolutionStudents = [];
 var proposedSolutionToQuestionSelected = null;
 
@@ -40,12 +41,27 @@ function loadData() {
         this.userLogged = JSON.parse(user);
         var question = localStorage.getItem('questionSelected');
         this.questionSelected = JSON.parse(question);
+
         this.saveToken = localStorage.getItem('X-Token');
 
-        this.getSolutionsFromStudents(this.questionSelected.idCuestion).then((res) => {
-            this.answersSolutionStudents = res;
-            setDataToPage();
-        });
+        this.reviewMode = JSON.parse(localStorage.getItem('review'));
+        if (this.reviewMode) {
+            this.answerToReview = JSON.parse(localStorage.getItem('answerToReview'));
+            if (this.answerToReview) {
+                $('#noAnswers').attr('hidden');
+                this.setDataToPage();
+            } else {
+                // TO-DO: SHOW ERROR MODAL
+                $('#noAnswers').removeAttr('hidden');
+            }
+        } else {
+            this.onlyUserLogged = JSON.parse(localStorage.getItem('onlyUserLogged'));
+
+            this.getSolutionsFromStudents(this.questionSelected.idCuestion).then((res) => {
+                this.answersSolutionStudents = res;
+                this.setDataToPage();
+            });
+        }
     }
 }
 
@@ -60,7 +76,13 @@ function getSolutionsFromStudents(idCuestion) {
                     solutionsParsered.map((solution) => {
                         var sol = solution.answer;
                         if (sol.idQuestion === idCuestion) {
-                            solutionsToProcess.push(sol);
+                            if (this.onlyUserLogged) {
+                                if (sol.student === this.userLogged.username) {
+                                    solutionsToProcess.push(sol);
+                                }
+                            } else {
+                                solutionsToProcess.push(sol);
+                            }
                         }
                     });
                 }
@@ -82,9 +104,49 @@ function supportsHTML5Storage() {
 }
 
 function setDataToPage() {
+    $('#userLogged')[0].innerText = "User logged: " + this.userLogged["username"];
 
     $('.firstTitle').text('Question: ' + this.questionSelected.enum_descripcion);
-    setAnswersToCollapsible();
+    if (this.reviewMode) {
+        this.setAnswerToCorrect();
+    } else {
+        this.setAnswersToCollapsible();
+    }
+}
+
+function setAnswerToCorrect() {
+    var answer = this.answerToReview.answer;
+    var question = this.answerToReview.question;
+    var structSolution = "<li>" +
+        "<div class='collapsible-header'>" +
+        "<i class='material-icons'>filter_drama</i>" + answer.student + "</div>" +
+        "<div class='collapsible-body'>" +
+        "<h5>Answer: " + answer.proposedSolution + "</h5>" +
+        "<div class='row actionCollapsibleBody'>" +
+        "<label>" +
+        "<input id='itsNotCorrectAnswer' type='checkbox'/>" +
+        "<span>It's correct</span>" +
+        "</label>" +
+        "<a href='#' onclick='saveCorrection()' class='right'>Save!</a>" +
+        "</div>" +
+        "</div>" +
+        "</li>";
+    $('#collapsibleOfAnswers').append(structSolution);
+}
+
+function saveCorrection() {
+    var answer = this.answerToReview.answer;
+    var isCorrect = $('#itsNotCorrectAnswer').prop('checked');
+    var answerToSave = {
+        isGood: isCorrect,
+    };
+    var answerParsered = JSON.stringify(answerToSave);
+
+    this.requestApi('PUT', 'solutions/' + answer.idAnswer, answerParsered, this.saveToken).then((res) => {
+        console.log(res);
+        // TO-DO: SHOW MODAL ALL IS GOING TO BE GOOD AND INFORM TO THE PREVIOUS PAGE
+        this.backToPreviousPage();
+    });
 }
 
 function setAnswersToCollapsible() {
@@ -92,17 +154,22 @@ function setAnswersToCollapsible() {
         $('#noAnswers').attr('hidden');
         this.answersSolutionStudents.map(function (propSolution, index) {
             getRationings(propSolution).then((res) => {
-                var struct = this.getFollowingRationings(res);
+                var isGood = propSolution.isGood ? 'correctAnswer' : 'incorrectAnswer';
+                var iconGood = propSolution.isGood ? 'check_circle' : 'cancel';
                 var structSolution = "<li>" +
                     "<div class='collapsible-header'>" +
                     "<i class='material-icons'>filter_drama</i>" + propSolution.student + "</div>" +
                     "<div class='collapsible-body'>" +
                     "<h5>Answer: " + propSolution.proposedSolution + "</h5>" +
-                    "<div id='answersFromStudent" + index + "'></div>" +
+                    "<div class='row'>" +
+                    "<span class='resText'>Result:</span>" +
+                    "<span>" +
+                    "<i class='material-icons " + isGood + "'>" + iconGood + "</i>" +
+                    "</span>" +
+                    "</div>" +
                     "</div>" +
                     "</li>";
                 $('#collapsibleOfAnswers').append(structSolution);
-                $('#answersFromStudent' + index).append(struct);
             });
         });
     } else {
@@ -132,69 +199,6 @@ function getRationings(answer) {
             reject(err);
         });
     });
-}
-
-function getAnswersFromFollowingSolutions(answers) {
-    var numSolutions = answers.length;
-    var structFollowingSolutions = [];
-    answers.map(function (answerStudent) {
-        var struct = null;
-        var followingSolutionTitle = answerStudent.followingSolution.title;
-        var stateFollowingSolution = answerStudent.followingSolution.isGood;
-        var answerFollowingSolution = answerStudent.answer;
-        var typeIcon = answerFollowingSolution === stateFollowingSolution ? 'check_circle' : 'cancel';
-        var correctAnswer = answerFollowingSolution === stateFollowingSolution ? 'correctAnswer' : 'incorrectAnswer';
-
-        var proposedRationing = answerStudent.proposeRationing.proposedRationing;
-
-        struct = "<div class='containerFollowingSolution'>" +
-            "<div class='followingSolution'>" +
-            "<span class='right'>" +
-            "<i class='material-icons " + correctAnswer + "'>" + typeIcon + "</i>" +
-            "</span>" +
-            "<h5 class='titleFollowingSolution'> Solution " + answerStudent.idAnswer + ": " + followingSolutionTitle + "</h5>" +
-            "<p class='proposedRationingFollowingSolution'>Proposed rationing: " + proposedRationing + "</p>";
-        if (answerStudent.followingSolution.rationings.length > 0) {
-            var structsRationgins = getFollowingRationings(answerStudent);
-            struct += structsRationgins;
-        }
-        struct += "</div>" +
-            "</div>";
-        structFollowingSolutions.push(struct);
-    });
-    return structFollowingSolutions;
-}
-
-function getFollowingRationings(answerStudent) {
-    var struct = "<div class='containerFollowingRationings'>";
-    answerStudent.forEach(rationing => {
-        var stateRationing = rationing.justifyRationing;
-        var titleRationing = rationing.title;
-        /*
-        var rationingStudent = answerStudent.proposedRationingsAnswers.filter(function (propRatio) {
-            return propRatio.idRationing === rationing.id;
-        });
-        var answerRationingStudent = false;
-        if (rationingStudent !== undefined && rationingStudent !== null) {
-            answerRationingStudent = rationingStudent[0].answer;
-        };
-        var typeIcon = answerRationingStudent === stateRationing ? 'check_circle' : 'cancel';
-        var correctAnswer = answerRationingStudent === stateRationing ? 'correctAnswer' : 'incorrectAnswer';
-        */
-        var typeIcon = 'check_circle';
-        var correctAnswer = 'correctAnswer';
-        var structRatio = "<div class='followingRationing'>" +
-            "<span class='right'>" +
-            "<i class='material-icons " + correctAnswer + "'>" + typeIcon + "</i>" +
-            "</span>" +
-            "<h5 class='titleFollowingSolution'> Rationing " + rationing.idRationing + ": " + titleRationing + "</h5>" +
-            "</div>";
-        struct += structRatio;
-    });
-
-    struct += "</div>";
-
-    return struct;
 }
 
 function backToPreviousPage() {

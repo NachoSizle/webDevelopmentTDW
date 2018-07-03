@@ -104,3 +104,10 @@ i.small.material-icons {
 .selected {
     background-color: #eeeeee !important;
 }
+
+#userLogged {
+    color: white;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}

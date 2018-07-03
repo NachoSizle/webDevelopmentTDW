@@ -38,10 +38,37 @@ function loadProfile() {
         this.userLogged = JSON.parse(user);
 
         var solutionsReview = localStorage.getItem('solutionsToReview');
-        this.solutionsToReview = JSON.parse(solutionsReview);
+        this.solutionsToReview = JSON.parse(solutionsReview) ? JSON.parse(solutionsReview) : [];
+        this.numSolutionsToReview = this.solutionsToReview.length;
+        if (this.solutionsToReview.length > 0) {
+            this.setQuestionsToReview();
+        } else {
+            $('.answerStudentsTitle').text('No hay nada que corregir! Descansa!');
+        }
+
+        $('#containerQuestionsToReview').removeAttr('hidden');
 
         setDataToPage();
     }
+}
+
+function setQuestionsToReview() {
+    this.solutionsToReview.forEach((solutionFromStudent, index) => {
+        var question = solutionFromStudent.question;
+        var answer = solutionFromStudent.answer;
+        var blockQuestion = "<div class='col s12 m6 hoverable' id='" + question.enum_descripcion + "'>" +
+            "<div class='card blue-grey darken-1'>" +
+            "<div class='card-content white-text noPadBottom'>" +
+            "<span class='card-title'>Question: " + question.enum_descripcion + "</span>" +
+            "<span>Student: " + answer.student + "</span>" +
+            "</div>" +
+            "<div class='card-action col s12 m12'>" +
+            "<a href='#' onclick='reviewAnswerFromStudents(" + index + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>sim_card_alert</i>Review answers</a>" +
+            "</div>" +
+            "</div>" +
+            "</div>";
+        $('#containerQuestionsToReview').append(blockQuestion);
+    });
 }
 
 function getQuestionsFromMaster() {
@@ -80,6 +107,7 @@ function supportsHTML5Storage() {
 
 function setDataToPage() {
     $('#hiMaster')[0].innerText = "Hola " + this.userLogged["username"];
+    $('#userLogged')[0].innerText = "User logged: " + this.userLogged["username"];
 
     getQuestions();
 }
@@ -113,7 +141,6 @@ function getQuestions() {
                     "<a href='#' onclick='viewThisQuestion(" + question.idCuestion + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View</a>" +
                     "<a href='#remModal' onclick='setQuestion(" + question.idCuestion + ")' class='modal-trigger linkBtnCard'><i class='material-icons iconBtnCard'>delete_forever</i>Remove</a>" +
                     "<a href='#' onclick='viewAnswerFromStudents(" + question.idCuestion + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View Answers</a>" +
-                    "<a href='#' " + hasSolutionToReview + " onclick='reviewAnswerFromStudents(" + question.idCuestion + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>sim_card_alert</i>Review answers</a>" +
                     "</div>" +
                     "</div>" +
                     "</div>";
@@ -150,13 +177,18 @@ function closeInfoModal() {
     $('#infoNoQuestionsModal').closeModal();
 }
 
-function reviewAnswerFromStudents(questionId) {
-    setSelectedQuestion(questionId);
-    window.location.href = "./reviewAnswerStudent.html";
+function reviewAnswerFromStudents(index) {
+    var answerSelected = this.solutionsToReview[index];
+    localStorage.setItem('answerToReview', JSON.stringify(answerSelected));
+    localStorage.setItem('review', true);
+    window.location.href = "./viewAnswerStudent.html";
 }
 
 function viewAnswerFromStudents(questionId) {
     setSelectedQuestion(questionId);
+    localStorage.setItem('onlyUserLogged', false);
+    localStorage.setItem('answerToReview', null);
+    localStorage.setItem('review', false);
     window.location.href = "./viewAnswerStudent.html";
 }
 

@@ -34,3 +34,10 @@ html {
 .noPadBottom {
     padding-bottom: 0px !important;
 }
+
+#userLogged {
+    color: white;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
