@@ -104,6 +104,9 @@ function getQuestionsFromMaster() {
             }
         }).catch((err) => {
             console.log(err);
+            if (err.status === 404) {
+                resolve([]);
+            }
             reject(err);
         });
     });
@@ -133,6 +136,10 @@ function getQuestions() {
 
     this.getQuestionsFromMaster().then((res) => {
         if (res.length > 0) {
+            $('.secondMainTitle').show();
+            $('.noQuestionsYet').hide();
+            $('.btnNewQuestion').hide();
+            $('.noQuestionsYet').hide();
             this.questions = res;
             this.numQuestions = this.questions.length;
 
@@ -159,7 +166,11 @@ function getQuestions() {
                 $('#containerQuestions').append(blockQuestion);
             });
         } else {
-            $('.secondTitle').text('You don\'t have any questions yet. Do you want to create one question?');
+            $('.noQuestionsYet').show();
+            $('.secondMainTitle').hide();
+            $('.btnNewQuestion').show();
+            $('.noQuestionsYet').show();
+            $('#infoNoQuestionsModal').modal('open');
         }
     }).catch((err) => {
         console.log(err);
@@ -183,10 +194,6 @@ function getSolutionProposedToQuestion(idQuestion) {
         });
     }
     return hasSolutionToReview;
-}
-
-function closeInfoModal() {
-    $('#infoNoQuestionsModal').closeModal();
 }
 
 function reviewAnswerFromStudents(index) {

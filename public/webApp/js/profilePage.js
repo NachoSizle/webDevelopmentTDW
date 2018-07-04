@@ -39,9 +39,8 @@ function supportsHTML5Storage() {
 
 function setInitData() {
     $('#userLogged')[0].innerText = "User logged: " + this.userLogged["username"];
-
-    $('#userName').text(this.userLogged.username);
-    $('#userEmail').text(this.userLogged.email);
+    $('#userName').text(this.userLogged.username + " " + this.userLogged.lastname);
+    $('#userEmail').append(this.userLogged.email + "<span class='right-align' id='userPhone'>" + this.userLogged.phone + "</span>");
 
     let classMaster = this.userLogged.maestro ? 'isActive' : 'isNotActive';
     let iconMaster = this.userLogged.maestro ? 'check' : 'clear';

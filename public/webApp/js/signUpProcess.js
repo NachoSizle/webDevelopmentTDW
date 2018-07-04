@@ -12,6 +12,7 @@ function init() {
 function initElements() {
     $(document).ready(function () {
         $('.sidenav').sidenav();
+        $('.modal').modal();
     });
 }
 
@@ -38,15 +39,16 @@ function validateData() {
 
 function updateData() {
     var emailInput = $("#inputEmail").val();
-    var isMaster = $("#chkMaster").prop('checked');
-    var isAdmin = $("#chkAdmin").prop('checked');
-    var isEnabled = $("#chkEnabled").prop('checked');
+    var phoneInput = $("#inputPhone").val();
+    var lastnameInput = $("#inputLastname").val();
 
     var userData = {
         'email': emailInput,
-        'isMaestro': isMaster,
-        'isAdmin': isAdmin,
-        'enabled': isEnabled
+        'phone': phoneInput,
+        'lastname': lastnameInput,
+        'isMaestro': false,
+        'isAdmin': false,
+        'enabled': false
     };
 
     var userDataJSON = JSON.stringify(userData);
@@ -55,10 +57,8 @@ function updateData() {
     this.requestApi('PUT', 'users/' + this.userDataSignUp.id, userDataJSON, token).then((response) => {
         console.log(response);
         if (response !== null && response !== undefined) {
-            var resParsered = JSON.parse(response);
-            this.userDataSignUp = resParsered['usuario'];
-            localStorage.setItem('userLogged', JSON.stringify(this.userDataSignUp));
-            resolveTo();
+            //TO-DO: SHOW MODAL THE USER IS NOT ENABLED
+            $('#notEnabledModal').modal('open');
         }
     }).catch((err) => {
         console.log(err);
@@ -66,10 +66,5 @@ function updateData() {
 }
 
 function resolveTo() {
-    if (this.userDataSignUp.maestro) {
-        window.location.href = "./masterMainPage.html";
-    } else {
-        window.location.href = "./studentMainPage.html";
-    }
-
+    window.location.href = "./../index.html";
 }

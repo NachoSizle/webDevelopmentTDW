@@ -41,7 +41,7 @@ i.small.material-icons {
     padding-left: 50px;
     position: relative;
     margin-left: 38px !important;
-    padding: 10px 0px !important;
+    padding: 4px 0px !important;
     padding-left: 35px !important;
     border-radius: 0px 10px 10px 0px;
 }
@@ -110,4 +110,9 @@ i.small.material-icons {
     position: absolute;
     top: 0px;
     right: 0px;
+}
+
+#userPhone {
+    float: right;
+    padding-right: 10px;
 }

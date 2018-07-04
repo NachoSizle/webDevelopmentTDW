@@ -24,28 +24,10 @@
             <form class="form-signin" onsubmit="validateData()">
                 <span id="reauth-email" class="reauth-email"></span>
                 <input type="email" id="inputEmail" class="form-control" placeholder="Email.." required autofocus>
-
-                <div class="row inputCheckboxes">
-                    <div class="col s4">
-                        <label>
-                            <input type="checkbox" id="chkMaster" />
-                            <span>Is Master?</span>
-                        </label>
-                    </div>
-                    <div class="col s4">
-                        <label>
-                            <input type="checkbox" id="chkAdmin" />
-                            <span>Is Admin?</span>
-                        </label>
-                    </div>
-                    <div class="col s4">
-                        <label>
-                            <input type="checkbox" id="chkEnabled" />
-                            <span>Is Enabled?</span>
-                        </label>
-                    </div>
-                </div>
-
+                <span id="reauth-email" class="reauth-email"></span>
+                <input type="tel" id="inputPhone" class="form-control" placeholder="Phone.." required autofocus>
+                <span id="reauth-email" class="reauth-email"></span>
+                <input type="text" id="inputLastname" class="form-control" placeholder="Lastname.." required autofocus>
                 <div class="center-align">
                     <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Start</button>
                 </div>
@@ -53,10 +35,20 @@
         </div>
     </div>
 
+    <div id="notEnabledModal" class="modal">
+        <div class="modal-content">
+            <h4>Congratulations!</h4>
+            <p>This user data has been saved but is not enabled. Please contact with the admin of this site!</p>
+        </div>
+        <div class="modal-footer">
+            <a onclick="resolveTo()" href="#!" class="modal-close waves-effect waves-green btn-flat">Okay..</a>
+        </div>
+    </div>
+
     <script src="./../js/jquery-3.2.1.slim.min.js"></script>
     <script src="./../js/materialize.js"></script>
-    <script src="./../js/signUpProcess.js"></script>
     <script src="./../js/api.js"></script>
+    <script src="./../js/signUpProcess.js"></script>
 </body>
 
 </html>

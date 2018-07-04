@@ -38,7 +38,9 @@ function setInitData() {
     $('#userLogged')[0].innerText = "User logged: " + this.userLogged["username"];
 
     $('#userName').val(this.userLogged.username);
+    $('#userLastname').val(this.userLogged.lastname);
     $('#userEmail').val(this.userLogged.email);
+    $('#userPhone').val(this.userLogged.phone);
 
     setAllLabels();
 
@@ -62,12 +64,18 @@ function setAllLabels() {
 
 function saveData() {
     var userInput = $("#userName").val();
+    var lastnameInput = $('#userLastname').val();
     var emailInput = $("#userEmail").val();
+    var phoneInput = $("#userPhone").val();
     var chkMaster = $('#chkMaster').prop('checked');
     var chkAdmin = $('#chkAdmin').prop('checked');
     var chkEnabled = $('#chkEnabled').prop('checked');
 
     var userData = {};
+
+    if (lastnameInput !== this.userLogged.lastname) {
+        userData['lastname'] = lastnameInput;
+    }
 
     if (userInput !== this.userLogged.username) {
         userData['username'] = userInput;
@@ -75,6 +83,10 @@ function saveData() {
 
     if (emailInput !== this.userLogged.email) {
         userData['email'] = emailInput;
+    }
+
+    if (phoneInput !== this.userLogged.phone) {
+        userData['phone'] = phoneInput;
     }
 
     if (chkMaster !== this.userLogged.maestro) {

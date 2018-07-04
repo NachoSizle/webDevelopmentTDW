@@ -14,6 +14,7 @@ function init() {
 function initElements() {
     $(document).ready(function () {
         $('.sidenav').sidenav();
+        $('.modal').modal();
     });
 }
 
@@ -127,7 +128,6 @@ function getUser() {
     var userDataJSON = JSON.stringify(userData);
 
     this.requestApi('POST', 'login', userDataJSON).then((response) => {
-        console.log(response);
         if (response) {
             var resParsered = JSON.parse(response);
             this.userSelected = resParsered['User']['usuario'];

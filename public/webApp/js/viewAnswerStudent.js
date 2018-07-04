@@ -59,6 +59,16 @@ function loadData() {
         } else {
             this.onlyUserLogged = JSON.parse(localStorage.getItem('onlyUserLogged'));
 
+            if (!this.onlyUserLogged) {
+                $('.onlyShowStudent').map((li) => {
+                    $($('.onlyShowStudent')[li]).hide()
+                });
+            } else {
+                $('.onlyShowMaster').map((li) => {
+                    $($('.onlyShowMaster')[li]).hide()
+                });
+            }
+
             this.getSolutionsFromStudents(this.questionSelected.idCuestion).then((res) => {
                 this.answersSolutionStudents = res;
                 this.setDataToPage();
@@ -92,6 +102,9 @@ function getSolutionsFromStudents(idCuestion) {
             }
         }).catch((err) => {
             console.log(err);
+            if (err.status === 404) {
+                resolve([]);
+            }
             reject(err);
         });
     });
@@ -157,7 +170,7 @@ function setAnswersToCollapsible() {
     if (this.answersSolutionStudents.length > 0) {
         $('#noAnswers').attr('hidden');
         this.answersSolutionStudents.map(function (propSolution, index) {
-            getRationings(propSolution).then((res) => {
+            if (propSolution !== null && propSolution !== undefined) {
                 var isGood = propSolution.isGood ? 'correctAnswer' : 'incorrectAnswer';
                 var iconGood = propSolution.isGood ? 'check_circle' : 'cancel';
                 var structSolution = "<li>" +
@@ -174,13 +187,13 @@ function setAnswersToCollapsible() {
                     "</div>" +
                     "</li>";
                 $('#collapsibleOfAnswers').append(structSolution);
-            });
+            }
         });
     } else {
         $('#noAnswers').removeAttr('hidden');
     }
 }
-
+/*
 function getRationings(answer) {
     return new Promise((resolve) => {
         var rationingToProcess = [];
@@ -200,10 +213,13 @@ function getRationings(answer) {
             }
         }).catch((err) => {
             console.log(err);
-            reject(err);
+            if (err.status === 404) {
+                resolve(null);
+            }
         });
     });
 }
+*/
 
 function backToPreviousPage() {
     window.location.href = './masterMainPage.html';

@@ -52,10 +52,14 @@
     <div>
         <span id="userLogged"></span>
         <h3 class="center-align" id="hiMaster"></h3>
-        <h5 class="secondTitle">Aqui tienes los enunciados que de las preguntas que hay en BBDD:</h5>
+        <h5 class="secondTitle secondMainTitle center-align">Aqui tienes los enunciados que de las preguntas que hay en BBDD:</h5>
+        <h5 class="secondTitle noQuestionsYet center-align" hidden>No tienes ninguna pregunta. ¿Quieres crear una nueva?</h5>
+        <div class="btnNewQuestion center-align" hidden>
+            <a href="#addModal" class="btn waves-effect waves-green modal-trigger">Create!</a>
+        </div>
         <div class="row" id="containerQuestions"></div>
         <div class="row" id="containerQuestionsToReview" hidden>
-            <h5 class="secondTitle answerStudentsTitle">Aqui tienes respuestas de los alumnos para corregir</h5>
+            <h5 class="secondTitle answerStudentsTitle center-align">Aqui tienes respuestas de los alumnos para corregir</h5>
         </div>
     </div>
 
@@ -85,7 +89,7 @@
         </div>
         <div class="modal-footer">
             <a href="#addModal" class="modal-action modal-close waves-effect waves-green btn-flat modal-trigger">Yes!</a>
-            <a onclick="closeInfoModal()" class="modal-action modal-close waves-effect waves-green btn-flat">Not yet</a>
+            <a class="modal-action modal-close waves-effect waves-green btn-flat">Not yet</a>
         </div>
     </div>
 
