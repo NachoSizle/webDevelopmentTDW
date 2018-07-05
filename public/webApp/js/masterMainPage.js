@@ -93,10 +93,14 @@ function getQuestionsFromMaster() {
                 var questionsParsered = resParsered.cuestions;
                 if (questionsParsered.length > 0) {
                     questionsParsered.map((question) => {
-                        var q = question.cuestion;
+                        var q = question.question.cuestion;
                         var creator = q.creador.usuario.id;
                         if (creator === idMaster) {
-                            questionsToProcess.push(q);
+                            var obj = {
+                                'cuestion': q,
+                                'numSolution': question.numSolutions
+                            };
+                            questionsToProcess.push(obj);
                         }
                     });
                 }
@@ -144,22 +148,24 @@ function getQuestions() {
             this.numQuestions = this.questions.length;
 
             this.questions.forEach(question => {
-                var checked = question.enum_disponible ? 'checked' : '';
-                var textChecked = question.enum_disponible ? 'Available' : 'Not available';
-                var hasSolutionToReview = getSolutionProposedToQuestion(question.idCuestion) ? '' : 'hidden';
-                var blockQuestion = "<div class='col s12 m6 hoverable' id='" + question.enum_descripcion + "'>" +
+                var cuestionRes = question.cuestion;
+                var checked = cuestionRes.enum_disponible ? 'checked' : '';
+                var textChecked = cuestionRes.enum_disponible ? 'Available' : 'Not available';
+                var hasSolutionToReview = getSolutionProposedToQuestion(cuestionRes.idCuestion) ? '' : 'hidden';
+                var blockQuestion = "<div class='col s12 m6 hoverable' id='" + cuestionRes.enum_descripcion + "'>" +
                     "<div class='card blue-grey darken-1'>" +
                     "<div class='card-content white-text noPadBottom'>" +
-                    "<span class='card-title'>" + question.enum_descripcion + "</span>" +
+                    "<span class='card-title'>" + cuestionRes.enum_descripcion + "</span>" +
                     "<label>" +
                     "<input type='checkbox'" + checked + " disabled/>" +
                     "<span>" + textChecked + "</span>" +
                     "</label>" +
                     "</div>" +
                     "<div class='card-action col s12 m12'>" +
-                    "<a href='#' onclick='viewThisQuestion(" + question.idCuestion + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View</a>" +
-                    "<a href='#remModal' onclick='setQuestion(" + question.idCuestion + ")' class='modal-trigger linkBtnCard'><i class='material-icons iconBtnCard'>delete_forever</i>Remove</a>" +
-                    "<a href='#' onclick='viewAnswerFromStudents(" + question.idCuestion + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View Answers</a>" +
+                    "<a href='#' onclick='viewThisQuestion(" + cuestionRes.idCuestion + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View</a>" +
+                    "<a href='#remModal' onclick='setQuestion(" + cuestionRes.idCuestion + ")' class='modal-trigger linkBtnCard'><i class='material-icons iconBtnCard'>delete_forever</i>Remove</a>" +
+                    "<a href='#' onclick='viewAnswerFromStudents(" + cuestionRes.idCuestion + ")' class='linkBtnCard'><i class='material-icons iconBtnCard'>visibility</i>View Answers</a>" +
+                    "<span class='linkBtnCard'>Solutions: " + question.numSolution + "</span>" +
                     "</div>" +
                     "</div>" +
                     "</div>";
